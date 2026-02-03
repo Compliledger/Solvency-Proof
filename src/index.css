@@ -1,0 +1,317 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* SolvencyProof Premium Design System
+   Luxury Monochrome Palette with Warm Cream Accent
+   Philosophy: Less but better. Every pixel must earn its place.
+*/
+
+@layer base {
+  :root {
+    /* Luxury Monochrome - Onyx/Graphite/Platinum */
+    --background: 0 0% 7%;
+    --foreground: 0 0% 92%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 92%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 92%;
+
+    /* Primary - Warm Cream Accent (used sparingly) */
+    --primary: 36 33% 86%;
+    --primary-foreground: 0 0% 7%;
+
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 85%;
+
+    --muted: 0 0% 16%;
+    --muted-foreground: 0 0% 55%;
+
+    --accent: 36 33% 86%;
+    --accent-foreground: 0 0% 7%;
+
+    /* Brand Colors - Monochrome Hierarchy */
+    --brand: 36 33% 86%;
+    --brand-2: 0 0% 75%;
+    --brand-3: 0 0% 55%;
+
+    /* Status - Muted, sophisticated tones */
+    --success: 145 30% 45%;
+    --success-foreground: 0 0% 98%;
+    --warning: 36 60% 50%;
+    --warning-foreground: 0 0% 7%;
+
+    --destructive: 0 45% 45%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 16%;
+    --input: 0 0% 16%;
+    --ring: 36 33% 86%;
+
+    --radius: 0.5rem;
+
+    --font-sans: "Inter", ui-sans-serif, system-ui;
+    --font-display: "Space Grotesk", ui-sans-serif, system-ui;
+
+    /* Subtle, Calm Shadows - No harsh glows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 92%;
+    --sidebar-primary: 36 33% 86%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 0 0% 16%;
+    --sidebar-ring: 36 33% 86%;
+  }
+
+  /* Light theme - Elegant warm whites */
+  .light {
+    --background: 40 20% 97%;
+    --foreground: 0 0% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+    --primary: 0 0% 12%;
+    --primary-foreground: 40 20% 97%;
+    --secondary: 40 10% 94%;
+    --secondary-foreground: 0 0% 12%;
+    --muted: 40 10% 94%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 36 33% 86%;
+    --accent-foreground: 0 0% 12%;
+    --border: 40 10% 90%;
+    --input: 40 10% 90%;
+    --ring: 0 0% 12%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "kern" 1, "liga" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.025em;
+    font-weight: 500;
+  }
+
+  ::selection {
+    background: hsl(36 33% 86% / 0.2);
+    color: hsl(0 0% 92%);
+  }
+}
+
+@layer utilities {
+
+  /* Elegant shadows - subtle, not flashy */
+  .shadow-subtle {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-elevated {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  .shadow-lifted {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Glassmorphism - refined, not overdone */
+  .glass {
+    background: hsl(0 0% 12% / 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid hsl(0 0% 20% / 0.5);
+  }
+
+  .glass-light {
+    background: hsl(0 0% 16% / 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid hsl(0 0% 22% / 0.4);
+  }
+
+  /* Text accent - used sparingly for emphasis */
+  .text-accent-cream {
+    color: hsl(36 33% 86%);
+  }
+
+  /* Subtle border accent */
+  .border-accent-subtle {
+    border-color: hsl(36 33% 86% / 0.3);
+  }
+
+  /* Refined hover states */
+  .hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Fade animations */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  /* Subtle float - minimal, not distracting */
+  .animate-subtle-float {
+    animation: subtleFloat 8s ease-in-out infinite;
+  }
+}
+
+@layer components {
+
+  /* Premium Card - clean, confident */
+  .premium-card {
+    @apply rounded-xl border border-border bg-card p-6 transition-all duration-300;
+    box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.12);
+  }
+
+  .premium-card:hover {
+    border-color: hsl(0 0% 22%);
+    box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Status badges - elegant, muted */
+  .status-verified {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+    background: hsl(145 30% 45% / 0.12);
+    color: hsl(145 35% 55%);
+    border: 1px solid hsl(145 30% 45% / 0.2);
+  }
+
+  .status-pending {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium;
+    background: hsl(36 60% 50% / 0.12);
+    color: hsl(36 60% 60%);
+    border: 1px solid hsl(36 60% 50% / 0.2);
+  }
+
+  /* Primary button - confident, minimal */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200;
+    background: hsl(36 33% 86%);
+    color: hsl(0 0% 7%);
+  }
+
+  .btn-primary:hover {
+    background: hsl(36 33% 90%);
+    transform: translateY(-1px);
+  }
+
+  /* Secondary button - subtle, refined */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200;
+    background: hsl(0 0% 14%);
+    color: hsl(0 0% 85%);
+    border: 1px solid hsl(0 0% 20%);
+  }
+
+  .btn-secondary:hover {
+    background: hsl(0 0% 18%);
+    border-color: hsl(0 0% 25%);
+  }
+}
+
+/* Keyframes - subtle, not attention-seeking */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtleFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* StarBorder Animations - refined timing */
+@keyframes star-movement-bottom {
+  0% {
+    transform: translate(0%, 0%);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: translate(-100%, 0%);
+    opacity: 0;
+  }
+}
+
+@keyframes star-movement-top {
+  0% {
+    transform: translate(0%, 0%);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: translate(100%, 0%);
+    opacity: 0;
+  }
+}
+
+.animate-star-movement-bottom {
+  animation: star-movement-bottom linear infinite alternate;
+}
+
+.animate-star-movement-top {
+  animation: star-movement-top linear infinite alternate;
+}
