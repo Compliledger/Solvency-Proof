@@ -10,6 +10,11 @@ import {
     Shield,
     ExternalLink,
     Github,
+    Zap,
+    GitBranch,
+    Wallet,
+    Lock,
+    Trophy,
     type LucideIcon
 } from "lucide-react";
 
@@ -20,20 +25,28 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-    { label: "Latest Proof", href: "/verify", icon: LayoutDashboard },
-    { label: "All Proofs", href: "/proofs", icon: FileText },
-    { label: "Verify Inclusion", href: "/inclusion", icon: Search },
+    { label: "Dashboard", href: "/verify", icon: LayoutDashboard },
+    { label: "Sessions", href: "/yellow", icon: Zap },
+    { label: "Liabilities", href: "/liabilities", icon: GitBranch },
+    { label: "Reserves", href: "/reserves", icon: Wallet },
+    { label: "Generate Proof", href: "/proof", icon: Lock },
+    { label: "Summary", href: "/summary", icon: Trophy },
 ];
 
 export function PortalLayout({ children }: PropsWithChildren) {
     const location = useLocation();
 
     const getPageTitle = () => {
-        if (location.pathname === "/verify" || location.pathname === "/app") return "Latest Verified Proof";
+        if (location.pathname === "/verify" || location.pathname === "/app") return "Dashboard";
+        if (location.pathname === "/yellow") return "Trading Sessions";
+        if (location.pathname === "/liabilities") return "User Liabilities";
+        if (location.pathname === "/reserves") return "Reserve Verification";
+        if (location.pathname === "/proof") return "Proof Generation";
+        if (location.pathname === "/summary") return "Summary";
         if (location.pathname === "/proofs" || location.pathname === "/app/reports") return "All Proofs";
         if (location.pathname.startsWith("/proofs/") || location.pathname.startsWith("/app/reports/")) return "Proof Details";
         if (location.pathname === "/inclusion" || location.pathname === "/app/inclusion") return "Verify Inclusion";
-        return "Proof Verifier";
+        return "SolvencyProof";
     };
 
     return (
@@ -78,18 +91,16 @@ export function PortalLayout({ children }: PropsWithChildren) {
 
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-3 mb-3">Verification</p>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wider px-3 mb-3">Verification Flow</p>
                     {navItems.map((item) => {
                         const isActive = location.pathname === item.href ||
-                            (item.href === "/proofs" && location.pathname.startsWith("/proofs/")) ||
-                            (item.href === "/verify" && location.pathname === "/app") ||
-                            (item.href === "/proofs" && location.pathname.startsWith("/app/reports"));
+                            (item.href === "/verify" && location.pathname === "/app");
                         const Icon = item.icon;
                         return (
                             <Link
                                 key={item.href}
                                 to={item.href}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
+                                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
                                     ? "bg-accent/15 text-foreground border border-accent/30 shadow-sm"
                                     : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 hover:border-border/50 border border-transparent"
                                     }`}
@@ -133,7 +144,7 @@ export function PortalLayout({ children }: PropsWithChildren) {
                             <span className="text-sm font-medium">{getPageTitle()}</span>
                         </div>
                         <div className="flex items-center gap-3">
-                            <span className="text-xs text-muted-foreground">Ethereum Mainnet</span>
+                            <span className="text-xs text-muted-foreground">Sepolia Testnet</span>
                             <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
                         </div>
                     </div>
