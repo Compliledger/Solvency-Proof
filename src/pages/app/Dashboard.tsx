@@ -38,7 +38,7 @@ export default function Dashboard() {
         setIsLoading(true);
         try {
             const health = await getHealth();
-            setHealthStatus(health.status === "healthy" ? "live" : "offline");
+            setHealthStatus(["healthy", "ok"].includes(health.status) ? "live" : "offline");
 
             const epochs = await getEpochCount();
             setEpochCount(epochs.epochCount || 0);

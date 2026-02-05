@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import logo from "@/assets/solvencyproof-logo.png";
 import Aurora from "@/components/reactbits/Aurora";
 import { Lock, Activity, Mail } from "lucide-react";
@@ -14,6 +15,8 @@ const roles = [
 
 export default function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { login, isAuthenticated } = useAuth();
     const [selectedRole, setSelectedRole] = useState<Role>("operator");
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -21,6 +24,14 @@ export default function Login() {
     const [isLoading, setIsLoading] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
     const [streamActive, setStreamActive] = useState(false);
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            const from = (location.state as any)?.from?.pathname || '/verify';
+            navigate(from, { replace: true });
+        }
+    }, [isAuthenticated, navigate, location]);
 
     // Initialize webcam
     useEffect(() => {
@@ -53,10 +64,12 @@ export default function Login() {
         setIsLoading(true);
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        localStorage.setItem("userRole", selectedRole);
-        localStorage.setItem("userEmail", email);
-        localStorage.setItem("userName", name);
-        navigate("/app");
+        // Use AuthContext login - stores in localStorage automatically
+        login(name, email, selectedRole);
+
+        // Navigate to intended destination or default
+        const from = (location.state as any)?.from?.pathname || '/verify';
+        navigate(from, { replace: true });
     };
 
     return (

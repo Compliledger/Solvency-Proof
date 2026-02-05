@@ -190,7 +190,7 @@ export default function Summary() {
 
                 {/* Links */}
                 <div className="flex flex-wrap items-center justify-center gap-4">
-                    <a
+                    {/* <a
                         href="https://github.com/Compliledger/SolvencyProof_Core"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -198,7 +198,7 @@ export default function Summary() {
                     >
                         <Github size={18} />
                         GitHub
-                    </a>
+                    </a> */}
                     <a
                         href={getEtherscanAddressUrl(CONTRACTS.REGISTRY)}
                         target="_blank"

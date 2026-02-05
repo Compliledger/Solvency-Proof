@@ -3,19 +3,21 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Product from "./pages/Product";
 import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/app/Login";
 
-// Verifier Pages (Public - No Auth Required)
+// Verifier Pages (Protected - Auth Required)
 import Dashboard from "./pages/app/Dashboard";
 import ReportsList from "./pages/app/ReportsList";
 import ReportDetail from "./pages/app/ReportDetail";
 import InclusionCheck from "./pages/app/InclusionCheck";
 
-// Demo Flow Pages
+// Operator Flow Pages (Protected - Auth Required)
 import YellowSessions from "./pages/app/YellowSessions";
 import Liabilities from "./pages/app/Liabilities";
 import Reserves from "./pages/app/Reserves";
@@ -26,41 +28,43 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Marketing Pages */}
-          <Route path="/" element={<Index />} />
-          <Route path="/product" element={<Product />} />
-          <Route path="/how-it-works" element={<HowItWorks />} />
-          <Route path="/login" element={<Login />} />
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            {/* Marketing Pages (Public) */}
+            <Route path="/" element={<Index />} />
+            <Route path="/product" element={<Product />} />
+            <Route path="/how-it-works" element={<HowItWorks />} />
+            <Route path="/login" element={<Login />} />
 
-          {/* Proof Verifier (Public) */}
-          <Route path="/verify" element={<Dashboard />} />
-          <Route path="/proofs" element={<ReportsList />} />
-          <Route path="/proofs/:id" element={<ReportDetail />} />
-          <Route path="/inclusion" element={<InclusionCheck />} />
+            {/* Protected Routes - Require Authentication */}
+            <Route path="/verify" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/proofs" element={<ProtectedRoute><ReportsList /></ProtectedRoute>} />
+            <Route path="/proofs/:id" element={<ProtectedRoute><ReportDetail /></ProtectedRoute>} />
+            <Route path="/inclusion" element={<ProtectedRoute><InclusionCheck /></ProtectedRoute>} />
 
-          {/* Demo Flow Pages */}
-          <Route path="/yellow" element={<YellowSessions />} />
-          <Route path="/liabilities" element={<Liabilities />} />
-          <Route path="/reserves" element={<Reserves />} />
-          <Route path="/proof" element={<ProofGenerator />} />
-          <Route path="/summary" element={<Summary />} />
+            {/* Operator Flow Pages (Protected) */}
+            <Route path="/yellow" element={<ProtectedRoute><YellowSessions /></ProtectedRoute>} />
+            <Route path="/liabilities" element={<ProtectedRoute><Liabilities /></ProtectedRoute>} />
+            <Route path="/reserves" element={<ProtectedRoute><Reserves /></ProtectedRoute>} />
+            <Route path="/proof" element={<ProtectedRoute><ProofGenerator /></ProtectedRoute>} />
+            <Route path="/summary" element={<ProtectedRoute><Summary /></ProtectedRoute>} />
 
-          {/* Legacy redirects */}
-          <Route path="/app" element={<Dashboard />} />
-          <Route path="/app/reports" element={<ReportsList />} />
-          <Route path="/app/reports/:id" element={<ReportDetail />} />
-          <Route path="/app/inclusion" element={<InclusionCheck />} />
+            {/* Legacy redirects (Protected) */}
+            <Route path="/app" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/app/reports" element={<ProtectedRoute><ReportsList /></ProtectedRoute>} />
+            <Route path="/app/reports/:id" element={<ProtectedRoute><ReportDetail /></ProtectedRoute>} />
+            <Route path="/app/inclusion" element={<ProtectedRoute><InclusionCheck /></ProtectedRoute>} />
 
-          {/* Catch-all */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+            {/* Catch-all */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
