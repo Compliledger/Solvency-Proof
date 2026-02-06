@@ -608,6 +608,186 @@ app.get("/api/yellow/status", (_req: Request, res: Response) => {
   });
 });
 
+// POST /api/yellow/stress-demo - Simulate Yellow Network liability streaming workflow
+// This demonstrates Yellow's core value: instant off-chain updates → aggregated proof
+app.post("/api/yellow/stress-demo", async (req: Request, res: Response) => {
+  try {
+    const { execSync } = await import("child_process");
+    const startTime = Date.now();
+    const events: Array<{ action: string; timestamp: number; details: string }> = [];
+
+    // Configuration from request or use defaults
+    const {
+      numUpdates = 10,
+      submitOnChain = false,
+      participants = ["user_alice", "user_bob", "user_charlie"],
+    } = req.body;
+
+    events.push({ action: "start", timestamp: Date.now(), details: "Yellow stress demo initiated" });
+
+    // Step 1: Create Yellow state channel session
+    const session = await yellowClearNode.createSession(participants);
+    events.push({ 
+      action: "session_created", 
+      timestamp: Date.now(), 
+      details: `Channel ${session.channelId.slice(0, 16)}... opened with ${participants.length} participants` 
+    });
+
+    // Step 2: Simulate rapid off-chain liability updates (the core Yellow value)
+    // These updates are INSTANT, require ZERO gas, and are cryptographically signed
+    const updateLog: Array<{ user: string; oldBalance: string; newBalance: string; nonce: number }> = [];
+    
+    for (let i = 0; i < numUpdates; i++) {
+      // Randomly select a user and update their balance
+      const user = participants[Math.floor(Math.random() * participants.length)];
+      const currentBalance = BigInt(session.allocations[user] || "0");
+      // Simulate trading activity: add between 0.01 and 0.05 ETH per update
+      const delta = BigInt(Math.floor(Math.random() * 40000000000000000) + 10000000000000000);
+      const newBalance = currentBalance + delta;
+      
+      const oldBalanceStr = session.allocations[user] || "0";
+      await yellowClearNode.updateAllocations(session.id, { [user]: newBalance.toString() });
+      
+      updateLog.push({
+        user,
+        oldBalance: oldBalanceStr,
+        newBalance: newBalance.toString(),
+        nonce: session.nonce + i + 1,
+      });
+    }
+    
+    events.push({ 
+      action: "liability_updates", 
+      timestamp: Date.now(), 
+      details: `${numUpdates} off-chain state transitions completed (zero gas cost)` 
+    });
+
+    // Step 3: Export session to liabilities CSV (final state → Merkle tree input)
+    const csvPath = yellowClearNode.exportToLiabilities(session.id);
+    events.push({ 
+      action: "export_liabilities", 
+      timestamp: Date.now(), 
+      details: `Session state exported to ${csvPath}` 
+    });
+
+    // Step 4: Build liabilities Merkle tree
+    execSync("npx tsx src/liabilities-builder.ts", {
+      cwd: path.join(__dirname, "../.."),
+      encoding: "utf-8",
+    });
+    events.push({ 
+      action: "merkle_built", 
+      timestamp: Date.now(), 
+      details: "Liabilities Merkle tree constructed" 
+    });
+
+    // Step 5: Scan reserves
+    execSync("npx tsx src/reserves-scanner.ts", {
+      cwd: path.join(__dirname, "../.."),
+      encoding: "utf-8",
+      timeout: 60000,
+    });
+    events.push({ 
+      action: "reserves_scanned", 
+      timestamp: Date.now(), 
+      details: "On-chain reserve balances fetched" 
+    });
+
+    // Step 6: Generate ZK proof
+    execSync("npx tsx src/solvency-prover.ts", {
+      cwd: path.join(__dirname, "../.."),
+      encoding: "utf-8",
+      timeout: 120000,
+    });
+    events.push({ 
+      action: "proof_generated", 
+      timestamp: Date.now(), 
+      details: "Groth16 ZK solvency proof created" 
+    });
+
+    // Load proof result
+    const proofPath = path.join(OUTPUT_DIR, "solvency_proof.json");
+    const proofData = fs.existsSync(proofPath)
+      ? JSON.parse(fs.readFileSync(proofPath, "utf-8"))
+      : null;
+
+    // Step 7: Optionally submit on-chain
+    let submissionResult = null;
+    if (submitOnChain) {
+      execSync("npx tsx src/submit-proof.ts", {
+        cwd: path.join(__dirname, "../.."),
+        encoding: "utf-8",
+        timeout: 120000,
+      });
+      events.push({ 
+        action: "proof_submitted", 
+        timestamp: Date.now(), 
+        details: "Proof verified and recorded on Sepolia" 
+      });
+
+      const submissionPath = path.join(OUTPUT_DIR, "submission_result.json");
+      submissionResult = fs.existsSync(submissionPath)
+        ? JSON.parse(fs.readFileSync(submissionPath, "utf-8"))
+        : null;
+    }
+
+    // Load final state
+    const liabilitiesPath = path.join(OUTPUT_DIR, "liabilities_total.json");
+    const reservesPath = path.join(OUTPUT_DIR, "reserves_snapshot.json");
+    const liabilities = fs.existsSync(liabilitiesPath)
+      ? JSON.parse(fs.readFileSync(liabilitiesPath, "utf-8"))
+      : null;
+    const reserves = fs.existsSync(reservesPath)
+      ? JSON.parse(fs.readFileSync(reservesPath, "utf-8"))
+      : null;
+
+    const totalTime = Date.now() - startTime;
+    const finalSession = yellowClearNode.getSession(session.id);
+
+    res.json({
+      success: true,
+      message: "Yellow Network stress demo completed",
+      summary: {
+        description: "Simulated high-frequency liability events via Yellow state channels",
+        yellowValue: "All balance updates were INSTANT and ZERO-GAS via off-chain state channels",
+        workflow: "Yellow sessions → Export → Merkle tree → ZK proof → On-chain verification",
+      },
+      session: {
+        id: session.id,
+        channelId: session.channelId,
+        totalUpdates: finalSession?.nonce || numUpdates,
+        finalAllocations: finalSession?.allocations,
+        stateHash: finalSession?.stateHash,
+      },
+      solvency: {
+        liabilitiesTotal: liabilities?.liabilities_total,
+        reservesTotal: reserves?.reserves_total_wei,
+        isSolvent: proofData?.solvencyResult?.isSolvent ?? 
+          (BigInt(reserves?.reserves_total_wei || "0") >= BigInt(liabilities?.liabilities_total || "0")),
+      },
+      proof: proofData ? {
+        generated: true,
+        verifiedLocally: proofData.verified,
+        epochId: proofData.calldata?.pubSignals?.[3],
+      } : null,
+      submission: submissionResult,
+      performance: {
+        totalTimeMs: totalTime,
+        avgUpdateTimeMs: totalTime / numUpdates,
+        events,
+      },
+      updateLog: updateLog.slice(0, 5), // Show first 5 updates as sample
+    });
+  } catch (err: unknown) {
+    const error = err as Error;
+    res.status(500).json({ 
+      error: "Stress demo failed", 
+      details: error.message,
+      hint: "Ensure circuits are compiled and reserves wallet has funds"
+    });
+  }
+});
+
 // GET /api/yellow/session/:sessionId/settlement - Get settlement transaction details
 app.get("/api/yellow/session/:sessionId/settlement", (req: Request, res: Response) => {
   try {
@@ -753,6 +933,7 @@ app.listen(Number(PORT), HOST, () => {
 ║  POST /api/yellow/session/:id/close - Close & settle          ║
 ║  POST /api/yellow/session/:id/export - Export to CSV          ║
 ║  GET  /api/yellow/sessions       - List all sessions          ║
+║  POST /api/yellow/stress-demo    - Yellow stress demo         ║
 ║  ─────────────────────────────────────────────────────────────║
 ║  POST /api/workflow/full         - Run complete workflow      ║
 ╚═══════════════════════════════════════════════════════════════╝

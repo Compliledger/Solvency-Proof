@@ -11,6 +11,9 @@ COPY pnpm-workspace.yaml package.json pnpm-lock.yaml ./
 # Copy backend package
 COPY backend/package.json ./backend/
 
+# Copy circuits package for snarkjs dependency
+COPY circuits/package.json ./circuits/
+
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
 
@@ -23,8 +26,15 @@ RUN mkdir -p data/yellow_sessions data/output
 # Copy data files if they exist
 COPY data ./data
 
-# Copy circuits for ZK proof generation (if exists)
+# Copy pre-compiled ZK circuits (wasm, zkey, verification_key)
+# These MUST be compiled locally before Docker build
 COPY circuits ./circuits
+
+# Verify circuit artifacts exist (fail fast if missing)
+RUN test -f circuits/build/solvency_final.zkey && \
+    test -f circuits/build/solvency_js/solvency.wasm && \
+    test -f circuits/build/verification_key.json || \
+    (echo "ERROR: Pre-compiled ZK circuits not found. Run 'cd circuits && bash scripts/setup.sh' first." && exit 1)
 
 # Set working directory to backend
 WORKDIR /app/backend

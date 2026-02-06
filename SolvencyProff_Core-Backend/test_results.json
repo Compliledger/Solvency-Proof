@@ -8,11 +8,11 @@
       "endpoint": "/health",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 1017.62,
+      "elapsed_ms": 1371.05,
       "success": true,
       "response": {
         "status": "ok",
-        "timestamp": "2026-02-04T13:01:08.977Z"
+        "timestamp": "2026-02-06T19:32:30.853Z"
       }
     },
     {
@@ -20,10 +20,10 @@
       "endpoint": "/api/liabilities",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 890.51,
+      "elapsed_ms": 587.97,
       "success": true,
       "response": {
-        "root": "0xa82c97d81113873ce337792957e7bde96bd4e79efd371021a175c3517ead8c5b",
+        "root": "0x934005bfbce16c8b6bbd708da0bf62f4a4693a2edf158679aea36bb3916dd312",
         "epochId": "epoch_001",
         "leafCount": 3,
         "timestamp": 0,
@@ -35,18 +35,18 @@
       "endpoint": "/api/liabilities/build",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 2851.63,
+      "elapsed_ms": 2933.15,
       "success": true,
       "response": {
         "success": true,
         "message": "Liabilities tree built successfully",
         "data": {
-          "liabilities_root": "0x146b9e833eec7907bfdf60ae5a6b29c2b8ad6775d556727f95e86c8e0edd3955",
+          "liabilities_root": "0x934005bfbce16c8b6bbd708da0bf62f4a4693a2edf158679aea36bb3916dd312",
           "epoch_id": "epoch_001",
           "timestamp": 0,
-          "leaf_count": 4
+          "leaf_count": 3
         },
-        "output": "\ud83d\udce6 SolvencyProof: Liabilities Merkle Builder\n\n\ud83d\udcc4 Loaded 4 liability entries from CSV\n\n\ud83c\udf33 Merkle Tree Built\n   Root:  0x146b9e833eec7907bfdf60ae5a6b29c2b8ad6775d556727f95e86c8e0edd3955\n   Total: 1103000\n   Leaves: 4\n\n\u2705 Saved liabilities_root.json\n\u2705 Saved liabilities_total.json (private)\n\u2705 Saved 4 inclusion proof files\n\n\ud83c\udf89 Liabilities Merkle build complete!\n"
+        "output": "\ud83d\udce6 SolvencyProof: Liabilities Merkle Builder\n\n\ud83d\udcc4 Loaded 3 liability entries from CSV\n\n\ud83c\udf33 Merkle Tree Built\n   Root:  0x934005bfbce16c8b6bbd708da0bf62f4a4693a2edf158679aea36bb3916dd312\n   Total: 300000000000000000\n   Leaves: 3\n\n\u2705 Saved liabilities_root.json\n\u2705 Saved liabilities_total.json (private)\n\u2705 Saved 3 inclusion proof files\n\n\ud83c\udf89 Liabilities Merkle build complete!\n"
       }
     },
     {
@@ -54,7 +54,7 @@
       "endpoint": "/api/liabilities/verify/alice",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 2369.28,
+      "elapsed_ms": 2517.44,
       "success": true,
       "response": {
         "success": true,
@@ -67,7 +67,7 @@
       "endpoint": "/api/liabilities/verify/unknown_user_xyz",
       "method": "GET",
       "status_code": 404,
-      "elapsed_ms": 1790.95,
+      "elapsed_ms": 2570.51,
       "success": true,
       "response": {
         "error": "User not found",
@@ -79,7 +79,7 @@
       "endpoint": "/api/reserves",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 1322.28,
+      "elapsed_ms": 857.28,
       "success": true,
       "response": {
         "epoch_id": "epoch_001",
@@ -102,27 +102,27 @@
       "endpoint": "/api/reserves/scan",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 3312.97,
+      "elapsed_ms": 3427.29,
       "success": true,
       "response": {
         "success": true,
         "message": "Reserves scanned successfully",
         "data": {
           "epoch_id": "epoch_001",
-          "timestamp": 1770210081428,
+          "timestamp": 1770406363583,
           "chain": "sepolia",
           "chain_id": 11155111,
           "addresses": [
             {
               "address": "0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E",
-              "balance": "0.350957064884011207",
-              "balanceWei": "350957064884011207"
+              "balance": "0.350529548658463977",
+              "balanceWei": "350529548658463977"
             }
           ],
-          "reserves_total": "0.350957064884011207",
-          "reserves_total_wei": "350957064884011207"
+          "reserves_total": "0.350529548658463977",
+          "reserves_total_wei": "350529548658463977"
         },
-        "output": "\ud83d\udce6 SolvencyProof: Reserves Scanner\n\n\ud83d\udccd Scanning 1 reserve address(es) on Sepolia\n\n   Using RPC: https://1rpc.io/sepolia\n   0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E: 0.350957064884011207 ETH\n\n\ud83d\udcb0 Total Reserves: 0.350957064884011207 ETH\n   (350957064884011207 wei)\n\n\u2705 Saved reserves_snapshot.json\n\n\ud83c\udf89 Reserves scan complete!\n"
+        "output": "\ud83d\udce6 SolvencyProof: Reserves Scanner\n\n\ud83d\udccd Scanning 1 reserve address(es) on Sepolia\n\n   Using RPC: https://1rpc.io/sepolia\n   0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E: 0.350529548658463977 ETH\n\n\ud83d\udcb0 Total Reserves: 0.350529548658463977 ETH\n   (350529548658463977 wei)\n\n\u2705 Saved reserves_snapshot.json\n\n\ud83c\udf89 Reserves scan complete!\n"
       }
     },
     {
@@ -130,7 +130,7 @@
       "endpoint": "/api/proof",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 695.24,
+      "elapsed_ms": 948.09,
       "success": true,
       "response": {
         "proof": {
@@ -200,13 +200,13 @@
       "endpoint": "/api/proof/generate",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 1655.23,
+      "elapsed_ms": 12525.2,
       "success": true,
       "response": {
         "success": true,
         "message": "Proof generated successfully",
         "data": {},
-        "output": "\ud83d\udd10 Generating Solvency ZK Proof...\n\n\u26a0\ufe0f  ZK circuits not compiled. Generating demonstration proof...\n   To compile circuits: cd circuits && ./scripts/compile.sh\n\n\ud83d\udcca Liabilities:\n   Root: 0x146b9e833eec7907bf...\n   Total: 1103000\n\n\ud83d\udcb0 Reserves:\n   Total Wei: 350957064884011207\n\n\u2705 Solvency verified: Reserves >= Liabilities\n   Surplus: 350957064882908207 wei\n\n\ud83d\udcdd Generating demonstration proof...\n\n\u2705 Demonstration proof generated!\n   \u26a0\ufe0f  Note: This is a DEMO proof, not cryptographically valid.\n   Public signals: [\n  '1',\n  '9236403621899062537024389748645315678173586130902453771400111089342830426453',\n  '350957064884011207',\n  '1770210083'\n]\n\n\ud83d\udcbe Complete proof saved to: /app/data/output/solvency_proof.json\n\n==================================================\nSOLVENCY PROOF SUMMARY\n==================================================\nEpoch ID:          1770210083\nLiabilities Root:  0x146b9e833eec7907bf...\nReserves Total:    350957064884011207 wei\nLiabilities Total: 1103000 (private)\nisSolvent:         YES \u2705\n==================================================\n\n\ud83c\udf89 Proof generation complete!\n"
+        "output": "\ud83d\udd10 Generating Solvency ZK Proof...\n\n\ud83d\udcca Liabilities:\n   Root: 0x934005bfbce16c8b6b...\n   Total: 300000000000000000\n\n\ud83d\udcb0 Reserves:\n   Total Wei: 350529548658463977\n\n\u2705 Solvency verified: Reserves >= Liabilities\n   Surplus: 50529548658463977 wei\n\n\ud83d\udcdd Circuit input written to: /app/circuits/build/input.json\n\n\u2699\ufe0f  Generating witness...\n\n\ud83d\udd2e Generating Groth16 proof...\n\n\u2705 Proof generated successfully!\n   Public signals: [\n  '1',\n  '938378016341142289329670516893878077864878173092222063212547671625630077711',\n  '350529548658463977',\n  '1770406366'\n]\n\n\ud83d\udd0d Verifying proof locally...\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: OK!\n\u2705 Local verification passed!\n\n\ud83d\udce6 Generating Solidity calldata...\n\n\ud83d\udcbe Complete proof saved to: /app/data/output/solvency_proof.json\n\n==================================================\nSOLVENCY PROOF SUMMARY\n==================================================\nEpoch ID:          1770406366\nLiabilities Root:  0x934005bfbce16c8b6b...\nReserves Total:    350529548658463977 wei\nLiabilities Total: 300000000000000000 (private)\nisSolvent:         YES \u2705\n==================================================\n\n\ud83c\udf89 Proof generation complete!\n"
       }
     },
     {
@@ -214,7 +214,7 @@
       "endpoint": "/api/contracts",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 507.27,
+      "elapsed_ms": 838.53,
       "success": true,
       "response": {
         "network": "sepolia",
@@ -231,10 +231,10 @@
       "endpoint": "/api/contracts/epoch-count",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 1436.07,
+      "elapsed_ms": 1550.07,
       "success": true,
       "response": {
-        "epochCount": 6
+        "epochCount": 7
       }
     },
     {
@@ -242,7 +242,7 @@
       "endpoint": "/api/contracts/proof/1",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 743.93,
+      "elapsed_ms": 1067.6,
       "success": true,
       "response": {
         "epochId": "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -258,7 +258,7 @@
       "endpoint": "/api/yellow/status",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 496.76,
+      "elapsed_ms": 580.71,
       "success": true,
       "response": {
         "connected": false,
@@ -272,7 +272,7 @@
       "endpoint": "/api/yellow/sessions",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 592.67,
+      "elapsed_ms": 551.6,
       "success": true,
       "response": {
         "sessions": [],
@@ -285,14 +285,14 @@
       "endpoint": "/api/yellow/session",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 741.08,
+      "elapsed_ms": 861.21,
       "success": true,
       "response": {
         "success": true,
         "message": "Yellow session created (state channel opened)",
         "session": {
-          "id": "session_1770210088404_85kbqd1d5",
-          "channelId": "0x0af98db96d0266aa4f7c727014dbe81eeaf70ce0503832b06676a68b83f907fc",
+          "id": "session_1770406382715_j8bou3yeu",
+          "channelId": "0x507a310afb25c70df303547d905404e83fe7fe21ccc68e3c1c7c3d72b2dda7a8",
           "participants": [
             "0x1234567890123456789012345678901234567890"
           ],
@@ -300,22 +300,22 @@
             "0x1234567890123456789012345678901234567890": "0"
           },
           "status": "open",
-          "stateHash": "0x29232d64a581eab4854b2579d7ccd7c541223119759a57273f4adf282f365d6f",
+          "stateHash": "0x3ee9951d5100743a9716b2d1844a8bafb56c7912fbb9d34664860ecc0e20a807",
           "nonce": 0,
-          "createdAt": "2026-02-04T13:01:28.404Z"
+          "createdAt": "2026-02-06T19:33:02.715Z"
         }
       }
     },
     {
       "name": "Get Session Details",
-      "endpoint": "/api/yellow/session/session_1770210088404_85kbqd1d5",
+      "endpoint": "/api/yellow/session/session_1770406382715_j8bou3yeu",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 779.87,
+      "elapsed_ms": 590.71,
       "success": true,
       "response": {
-        "id": "session_1770210088404_85kbqd1d5",
-        "channelId": "0x0af98db96d0266aa4f7c727014dbe81eeaf70ce0503832b06676a68b83f907fc",
+        "id": "session_1770406382715_j8bou3yeu",
+        "channelId": "0x507a310afb25c70df303547d905404e83fe7fe21ccc68e3c1c7c3d72b2dda7a8",
         "participants": [
           "0x1234567890123456789012345678901234567890"
         ],
@@ -324,12 +324,12 @@
         },
         "nonce": 0,
         "status": "open",
-        "stateHash": "0x29232d64a581eab4854b2579d7ccd7c541223119759a57273f4adf282f365d6f",
+        "stateHash": "0x3ee9951d5100743a9716b2d1844a8bafb56c7912fbb9d34664860ecc0e20a807",
         "signatures": {
-          "0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E": "0x6af779d9802a1d49d3a5234e766a0cb542f7e641546c64fbb2e13afb6c4e4a3620632b2109293567decbeffec86ff6d6fa356a60ff42e2aaa0372a95769ec2a61c"
+          "0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E": "0xd350f27bf9c68a7d8c69eec4c766253c5666dfde7cffb35f1a339874c62ad2ff2e8547c78a4c13abd2167933ad873da91157cf04724392d11aee88bebd5a14261b"
         },
-        "createdAt": "2026-02-04T13:01:28.404Z",
-        "updatedAt": "2026-02-04T13:01:28.404Z",
+        "createdAt": "2026-02-06T19:33:02.715Z",
+        "updatedAt": "2026-02-06T19:33:02.715Z",
         "metadata": {
           "version": 1,
           "turnNum": 0,
@@ -339,51 +339,51 @@
     },
     {
       "name": "Update Allocations",
-      "endpoint": "/api/yellow/session/session_1770210088404_85kbqd1d5/allocations",
+      "endpoint": "/api/yellow/session/session_1770406382715_j8bou3yeu/allocations",
       "method": "PUT",
       "status_code": 200,
-      "elapsed_ms": 743.76,
+      "elapsed_ms": 816.84,
       "success": true,
       "response": {
         "success": true,
         "message": "Allocations updated off-chain (nonce: 1)",
         "session": {
-          "id": "session_1770210088404_85kbqd1d5",
+          "id": "session_1770406382715_j8bou3yeu",
           "allocations": {
             "0x1234567890123456789012345678901234567890": "0",
             "user1": "1000",
             "user2": "2000"
           },
           "nonce": 1,
-          "stateHash": "0x5c1474efd1b5059d73b4f2e52c10cf6d7c7271c256fdb843b58014ed4c346376",
+          "stateHash": "0x51adac1b45c19d479195e6606fc70fdde95d25338f1eec088c2a7c31547c5c04",
           "status": "open",
-          "updatedAt": "2026-02-04T13:01:29.915Z"
+          "updatedAt": "2026-02-06T19:33:04.129Z"
         }
       }
     },
     {
       "name": "Get Session History",
-      "endpoint": "/api/yellow/session/session_1770210088404_85kbqd1d5/history",
+      "endpoint": "/api/yellow/session/session_1770406382715_j8bou3yeu/history",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 633.67,
+      "elapsed_ms": 617.98,
       "success": true,
       "response": {
-        "sessionId": "session_1770210088404_85kbqd1d5",
+        "sessionId": "session_1770406382715_j8bou3yeu",
         "history": [
           {
-            "timestamp": "2026-02-04T13:01:28.411Z",
+            "timestamp": "2026-02-06T19:33:02.723Z",
             "nonce": 0,
-            "stateHash": "0x29232d64a581eab4854b2579d7ccd7c541223119759a57273f4adf282f365d6f",
+            "stateHash": "0x3ee9951d5100743a9716b2d1844a8bafb56c7912fbb9d34664860ecc0e20a807",
             "allocations": {
               "0x1234567890123456789012345678901234567890": "0"
             },
             "status": "open"
           },
           {
-            "timestamp": "2026-02-04T13:01:29.917Z",
+            "timestamp": "2026-02-06T19:33:04.135Z",
             "nonce": 1,
-            "stateHash": "0x5c1474efd1b5059d73b4f2e52c10cf6d7c7271c256fdb843b58014ed4c346376",
+            "stateHash": "0x51adac1b45c19d479195e6606fc70fdde95d25338f1eec088c2a7c31547c5c04",
             "allocations": {
               "0x1234567890123456789012345678901234567890": "0",
               "user1": "1000",
@@ -400,11 +400,11 @@
       "endpoint": "/api/workflow/full",
       "method": "POST",
       "status_code": 500,
-      "elapsed_ms": 7951.15,
+      "elapsed_ms": 19080.78,
       "success": false,
       "response": {
         "error": "Workflow failed",
-        "details": "Command failed: npx tsx src/submit-proof.ts\n\n\u274c Submission failed: The contract function \"submitProof\" reverted with the following reason:\nInvalid proof\n\nContract Call:\n  address:   0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d\n  function:  submitProof(bytes32 epochId, bytes32 liabilitiesRoot, uint256 reservesTotal, uint256[2] _pA, uint256[2][2] _pB, uint256[2] _pC, uint256[4] _pubSignals)\n  args:                 (0x000000000000000000000000000000000000000000000000000000006983432f, 0x146b9e833eec7907bfdf60ae5a6b29c2b8ad6775d556727f95e86c8e0edd3955, 350957064884011207, [\"376689661388848170753\",\"376689661388848170754\"], [[\"376689661388848170755\",\"376689661388848170756\"],[\"376689661388848170757\",\"376689661388848170758\"]], [\"376689661388848170759\",\"376689661388848170760\"], [\"1\",\"9236403621899062537024389748645315678173586130902453771400111089342830426453\",\"350957064884011207\",\"1770210095\"])\n  sender:    0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E\n\nDocs: https://viem.sh/docs/contract/writeContract\nVersion: viem@2.45.1\n\n\u274c Error: The contract function \"submitProof\" reverted with the following reason:\nInvalid proof\n\nContract Call:\n  address:   0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d\n  function:  submitProof(bytes32 epochId, bytes32 liabilitiesRoot, uint256 reservesTotal, uint256[2] _pA, uint256[2][2] _pB, uint256[2] _pC, uint256[4] _pubSignals)\n  args:                 (0x000000000000000000000000000000000000000000000000000000006983432f, 0x146b9e833eec7907bfdf60ae5a6b29c2b8ad6775d556727f95e86c8e0edd3955, 350957064884011207, [\"376689661388848170753\",\"376689661388848170754\"], [[\"376689661388848170755\",\"376689661388848170756\"],[\"376689661388848170757\",\"376689661388848170758\"]], [\"376689661388848170759\",\"376689661388848170760\"], [\"1\",\"9236403621899062537024389748645315678173586130902453771400111089342830426453\",\"350957064884011207\",\"1770210095\"])\n  sender:    0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E\n\nDocs: https://viem.sh/docs/contract/writeContract\nVersion: viem@2.45.1\n"
+        "details": "Command failed: npx tsx src/submit-proof.ts\n\n\u274c Submission failed: The contract function \"submitProof\" reverted with the following reason:\nInvalid proof\n\nContract Call:\n  address:   0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d\n  function:  submitProof(bytes32 epochId, bytes32 liabilitiesRoot, uint256 reservesTotal, uint256[2] _pA, uint256[2][2] _pB, uint256[2] _pC, uint256[4] _pubSignals)\n  args:                 (0x00000000000000000000000000000000000000000000000000000000698641f7, 0x02131a67194c8c0e42cc9f6a1c3b59dd2bcd815571e934c5e2fd8af7c16dd30f, 350529548658463977, [\"15472915193980738409953586587885309831672541886512702076739477862619527014483\",\"20433861614631887790898473384677592091019441776665380019426849965054720137740\"], [[\"9592723072554798610730908440224070579581611036171102530018305407070524150439\",\"479826027794673249042373121356887645709474013098304112566221234668404167969\"],[\"14411934642178625507334996776237340829254777198652407992633158961914600640802\",\"20640555228604083249080461198249175002118813699021557424835285843992206820792\"]], [\"20983576922190552907068566782901392689901939880358423900980241236046619560889\",\"19756683947968819187433819204209608860222310618396113295612749356821115367306\"], [\"1\",\"938378016341142289329670516893878077864878173092222063212547671625630077711\",\"350529548658463977\",\"1770406391\"])\n  sender:    0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E\n\nDocs: https://viem.sh/docs/contract/writeContract\nVersion: viem@2.45.1\n\n\u274c Error: The contract function \"submitProof\" reverted with the following reason:\nInvalid proof\n\nContract Call:\n  address:   0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d\n  function:  submitProof(bytes32 epochId, bytes32 liabilitiesRoot, uint256 reservesTotal, uint256[2] _pA, uint256[2][2] _pB, uint256[2] _pC, uint256[4] _pubSignals)\n  args:                 (0x00000000000000000000000000000000000000000000000000000000698641f7, 0x02131a67194c8c0e42cc9f6a1c3b59dd2bcd815571e934c5e2fd8af7c16dd30f, 350529548658463977, [\"15472915193980738409953586587885309831672541886512702076739477862619527014483\",\"20433861614631887790898473384677592091019441776665380019426849965054720137740\"], [[\"9592723072554798610730908440224070579581611036171102530018305407070524150439\",\"479826027794673249042373121356887645709474013098304112566221234668404167969\"],[\"14411934642178625507334996776237340829254777198652407992633158961914600640802\",\"20640555228604083249080461198249175002118813699021557424835285843992206820792\"]], [\"20983576922190552907068566782901392689901939880358423900980241236046619560889\",\"19756683947968819187433819204209608860222310618396113295612749356821115367306\"], [\"1\",\"938378016341142289329670516893878077864878173092222063212547671625630077711\",\"350529548658463977\",\"1770406391\"])\n  sender:    0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E\n\nDocs: https://viem.sh/docs/contract/writeContract\nVersion: viem@2.45.1\n"
       }
     }
   ]
