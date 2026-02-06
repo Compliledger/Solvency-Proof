@@ -299,9 +299,9 @@ describe("📋 ALL API ENDPOINTS TEST SUITE", () => {
   });
 
   // ==========================================
-  // YELLOW NETWORK ENDPOINTS (6 endpoints)
+  // YELLOW NETWORK ENDPOINTS (7 endpoints)
   // ==========================================
-  describe("6️⃣  🟡 YELLOW NETWORK ENDPOINTS (6 endpoints)", () => {
+  describe("6️⃣  🟡 YELLOW NETWORK ENDPOINTS (7 endpoints)", () => {
     let yellowSessionId: string;
 
     it("POST /api/yellow/session - Create Yellow session (OFF-CHAIN)", async () => {
@@ -417,6 +417,36 @@ describe("📋 ALL API ENDPOINTS TEST SUITE", () => {
       console.log("      Entries:", data.entries);
       console.log("      Ready for Merkle tree building");
     });
+
+    it("POST /api/yellow/stress-demo - Yellow stress demo (FULL PIPELINE)", async () => {
+      if (!apiAvailable) return;
+
+      console.log("\n   🚀 YELLOW STRESS DEMO");
+      console.log("   =====================");
+      console.log("   Single API call that demonstrates Yellow's core value:\n");
+
+      const { status, data } = await apiCall("/api/yellow/stress-demo", "POST", {
+        numUpdates: 5,
+        submitOnChain: false,
+        participants: ["demo_alice", "demo_bob", "demo_charlie"],
+      });
+
+      expect(status).toBe(200);
+      expect(data.success).toBe(true);
+
+      console.log("   ✓ POST /api/yellow/stress-demo → Complete!");
+      console.log("      Session:", data.session?.id);
+      console.log("      Off-chain updates:", data.summary?.offChainUpdates);
+      console.log("      Solvency status:", data.solvency?.status);
+      console.log("      Proof generated:", data.proof?.generated ? "Yes" : "No");
+      console.log("\n   ⚡ This demonstrates:");
+      console.log("      1. Session creation (instant)");
+      console.log("      2. Rapid off-chain updates (zero gas)");
+      console.log("      3. Export to liabilities");
+      console.log("      4. Merkle tree building");
+      console.log("      5. ZK proof generation");
+      console.log("      6. Optional on-chain submission");
+    });
   });
 
   // ==========================================
@@ -491,15 +521,16 @@ describe("📋 ALL API ENDPOINTS TEST SUITE", () => {
       console.log("║  18.GET  /api/yellow/sessions              ✓  (OFF-CHAIN)  ║");
       console.log("║  19.POST /api/yellow/session/:id/close     ✓  (OFF-CHAIN)  ║");
       console.log("║  20.POST /api/yellow/session/:id/export    ✓  (OFF-CHAIN)  ║");
+      console.log("║  21.POST /api/yellow/stress-demo           ✓  (FULL DEMO)  ║");
       console.log("║  ──────────────────────────────────────────────────────────║");
-      console.log("║  21.POST /api/workflow/full                ✓  (ON-CHAIN TX)║");
+      console.log("║  22.POST /api/workflow/full                ✓  (ON-CHAIN TX)║");
       console.log("║                                                            ║");
       console.log("╠════════════════════════════════════════════════════════════╣");
-      console.log("║  TOTAL ENDPOINTS: 21                                       ║");
+      console.log("║  TOTAL ENDPOINTS: 22                                       ║");
       console.log("║  ON-CHAIN TX ENDPOINTS: 2 (proof/submit, workflow/full)    ║");
       console.log("║  ON-CHAIN READ ENDPOINTS: 3 (reserves/scan, epoch-count,   ║");
       console.log("║                              contracts/proof)              ║");
-      console.log("║  YELLOW OFF-CHAIN ENDPOINTS: 6 (instant, no gas)           ║");
+      console.log("║  YELLOW OFF-CHAIN ENDPOINTS: 7 (instant, no gas)           ║");
       console.log("╠════════════════════════════════════════════════════════════╣");
 
       if (onChainTxCount > 0) {

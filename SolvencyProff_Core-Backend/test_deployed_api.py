@@ -193,6 +193,12 @@ def main():
             
             test_endpoint("Get Session History", "GET", f"/api/yellow/session/{session_id}/history")
     
+    # Test Yellow Stress Demo endpoint (new!)
+    log_info("Testing Yellow stress demo (simulates rapid off-chain updates)...")
+    test_endpoint("Yellow Stress Demo", "POST", "/api/yellow/stress-demo",
+                  data={"numUpdates": 5, "submitOnChain": False},
+                  check_fields=["success", "summary", "session", "solvency"])
+    
     # ==========================================
     # 7. Workflow Endpoint
     # ==========================================
@@ -234,7 +240,7 @@ def main():
     log_header("HACKMONEY READINESS ASSESSMENT")
     
     critical_tests = ["Health Check", "Get Liabilities", "Build Merkle Tree", 
-                      "Get Reserves", "Get Contract Addresses"]
+                      "Get Reserves", "Get Contract Addresses", "Yellow Stress Demo"]
     critical_passed = sum(1 for t in results["tests"] 
                          if t.get("name") in critical_tests and t.get("success"))
     

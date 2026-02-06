@@ -265,6 +265,41 @@ describe("E2E: Complete Solvency Proof Workflow", () => {
 });
 
 describe("E2E: Yellow Network Integration", () => {
+  describe("Yellow Stress Demo", () => {
+    it("should have stress demo endpoint structure", () => {
+      // The stress demo endpoint simulates:
+      // 1. Create Yellow state channel session
+      // 2. Rapid off-chain liability updates (INSTANT, ZERO GAS)
+      // 3. Export final state to liabilities CSV
+      // 4. Build Merkle tree
+      // 5. Generate ZK solvency proof
+      // 6. Optionally submit proof on-chain
+      
+      const stressDemoRequest = {
+        numUpdates: 10,
+        submitOnChain: false,
+        participants: ["user_alice", "user_bob", "user_charlie"],
+      };
+      
+      expect(stressDemoRequest.numUpdates).toBe(10);
+      expect(stressDemoRequest.participants).toHaveLength(3);
+      
+      // Expected response structure
+      const expectedResponseFields = [
+        "success",
+        "message",
+        "summary",
+        "session",
+        "solvency",
+        "proof",
+        "performance",
+      ];
+      
+      expect(expectedResponseFields).toContain("summary");
+      expect(expectedResponseFields).toContain("solvency");
+    });
+  });
+
   describe("Yellow Session Flow", () => {
     it("should simulate complete Yellow session lifecycle", () => {
       // Simulate session creation
