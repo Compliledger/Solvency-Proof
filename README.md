@@ -7,9 +7,6 @@
 [![Contracts](https://img.shields.io/badge/Contracts-Sepolia-blue)](https://sepolia.etherscan.io/address/0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d)
 [![Circuits](https://img.shields.io/badge/ZK-Groth16-orange)](./SolvencyProff_Core-Backend/circuits/solvency.circom)
 
-## 🎬 Demo Video
-
-**[▶️ Watch Demo Video](#)** ← *Add your video link here*
 
 **Quick Links:**
 - 🔗 [Live Backend API](https://solvency-proof-production.up.railway.app/health) - Health check responding
