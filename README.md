@@ -4,14 +4,14 @@
 
 [![Deployed](https://img.shields.io/badge/Status-Live-success)](https://solvency-proof-production.up.railway.app)
 [![Protocol](https://img.shields.io/badge/Type-ZK%20Solvency-purple)](./SolvencyProff_Core-Backend/backend/API.md)
-[![Contracts](https://img.shields.io/badge/Contracts-Sepolia-blue)](https://sepolia.etherscan.io/address/0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d)
+[![Contracts](https://img.shields.io/badge/Contracts-Sepolia-blue)](https://sepolia.etherscan.io/address/0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4)
 [![Circuits](https://img.shields.io/badge/ZK-Groth16-orange)](./SolvencyProff_Core-Backend/circuits/solvency.circom)
 
 
 **Quick Links:**
 - 🔗 [Live Backend API](https://solvency-proof-production.up.railway.app/health) - Health check responding
-- 📜 [Registry Contract on Etherscan](https://sepolia.etherscan.io/address/0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d) - Verified proofs on-chain
-- 🔐 [Verifier Contract on Etherscan](https://sepolia.etherscan.io/address/0x5e22F8cB0CfbC0df5F2251009674E1266E1D2DD6) - Groth16 ZK verifier
+- 📜 [Registry Contract on Etherscan](https://sepolia.etherscan.io/address/0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4) - Verified proofs on-chain
+- 🔐 [Verifier Contract on Etherscan](https://sepolia.etherscan.io/address/0x9e2f50145E2f5299857a33ed937f77DCeD61FBB6) - Groth16 ZK verifier
 - 💻 [Frontend App](./Solvency-Proof-Frontend) - React dashboard with real-time verification
 - 📊 [API Documentation](./SolvencyProff_Core-Backend/backend/API.md) - Complete endpoint reference
 
@@ -47,7 +47,7 @@ This project is submitted for the **Yellow Network $15,000 Prize** at [ETHGlobal
 
 ---
 
-## �🏆 What Makes SolvencyProof Unique
+## � What Makes SolvencyProof Unique
 
 | Feature | Traditional Audit | SolvencyProof | Benefit |
 |---------|-------------------|---------------|---------|
@@ -62,8 +62,8 @@ This project is submitted for the **Yellow Network $15,000 Prize** at [ETHGlobal
 ## ✅ What We Built (Achievements)
 
 ### **🚀 Fully Deployed & Live**
-- ✅ **SolvencyProofRegistry Contract** on Sepolia: [`0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d`](https://sepolia.etherscan.io/address/0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d)
-- ✅ **Groth16Verifier Contract** on Sepolia: [`0x5e22F8cB0CfbC0df5F2251009674E1266E1D2DD6`](https://sepolia.etherscan.io/address/0x5e22F8cB0CfbC0df5F2251009674E1266E1D2DD6)
+- ✅ **SolvencyProofRegistry Contract** on Sepolia: [`0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4`](https://sepolia.etherscan.io/address/0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4)
+- ✅ **Groth16Verifier Contract** on Sepolia: [`0x9e2f50145E2f5299857a33ed937f77DCeD61FBB6`](https://sepolia.etherscan.io/address/0x9e2f50145E2f5299857a33ed937f77DCeD61FBB6)
 - ✅ **Backend API** on Railway: [Live Health Check](https://solvency-proof-production.up.railway.app/health) - All 21 endpoints operational
 - ✅ **Frontend Dashboard** with React + TailwindCSS: Complete verification portal
 
@@ -207,7 +207,7 @@ Connect Wallet → Create Session → Add Users → Build Tree → Scan Reserves
 | **Merkle Tree Builder** | ✅ Complete | Privacy-preserving liability commitment | [liabilities-builder.ts](./SolvencyProff_Core-Backend/backend/src/liabilities-builder.ts) |
 | **Reserve Scanner** | ✅ Complete | On-chain ETH balance verification | [reserves-scanner.ts](./SolvencyProff_Core-Backend/backend/src/reserves-scanner.ts) |
 | **Yellow Network** | ✅ Complete | State channels for instant updates | [API /api/yellow/*](./SolvencyProff_Core-Backend/backend/API.md#yellow-network-session-endpoints) |
-| **Smart Contracts** | ✅ Deployed | On-chain proof verification | [Etherscan](https://sepolia.etherscan.io/address/0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d) |
+| **Smart Contracts** | ✅ Deployed | On-chain proof verification | [Etherscan](https://sepolia.etherscan.io/address/0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4) |
 | **Backend API** | ✅ Live | 21 endpoints, Railway hosted | [API Health](https://solvency-proof-production.up.railway.app/health) |
 | **Frontend Portal** | ✅ Complete | React dashboard with auth | [Frontend](./Solvency-Proof-Frontend) |
 | **User Inclusion Proofs** | ✅ Complete | Merkle proofs for individual users | [GET /api/liabilities/verify/:userId](./SolvencyProff_Core-Backend/backend/API.md#get-apiliabilitiesverifyuserid) |
@@ -252,7 +252,7 @@ Connect Wallet → Create Session → Add Users → Build Tree → Scan Reserves
 │                     ETHEREUM SEPOLIA BLOCKCHAIN                          │
 │  ┌─────────────────────────────┐  ┌─────────────────────────────┐      │
 │  │   Groth16Verifier.sol       │  │  SolvencyProofRegistry.sol  │      │
-│  │   0x5e22F8...E1D2DD6        │  │  0x7a9f15...b708aB33d       │      │
+│  │   0x9e2f50...eD61FBB6       │  │  0xC392C0...A83E6f4         │      │
 │  │                             │  │                             │      │
 │  │   • verifyProof()           │  │   • submitProof()           │      │
 │  │   • Validates ZK proofs     │◀─│   • getProof()              │      │
@@ -390,8 +390,8 @@ function submitProof(
 
 | Contract | Address | Purpose |
 |----------|---------|---------|
-| **SolvencyProofRegistry** | [`0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d`](https://sepolia.etherscan.io/address/0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d) | Stores verified solvency proofs |
-| **Groth16Verifier** | [`0x5e22F8cB0CfbC0df5F2251009674E1266E1D2DD6`](https://sepolia.etherscan.io/address/0x5e22F8cB0CfbC0df5F2251009674E1266E1D2DD6) | Verifies ZK proofs on-chain |
+| **SolvencyProofRegistry** | [`0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4`](https://sepolia.etherscan.io/address/0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4) | Stores verified solvency proofs |
+| **Groth16Verifier** | [`0x9e2f50145E2f5299857a33ed937f77DCeD61FBB6`](https://sepolia.etherscan.io/address/0x9e2f50145E2f5299857a33ed937f77DCeD61FBB6) | Verifies ZK proofs on-chain |
 
 ### Backend API
 
@@ -644,4 +644,4 @@ MIT License - See [LICENSE](./LICENSE) for details.
 
 **Built with ❤️ by the SolvencyProof Team**
 
-[GitHub](https://github.com/your-org/Solvency-Proof) | [Live API](https://solvency-proof-production.up.railway.app) | [Etherscan](https://sepolia.etherscan.io/address/0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d)
+[GitHub](https://github.com/your-org/Solvency-Proof) | [Live API](https://solvency-proof-production.up.railway.app) | [Etherscan](https://sepolia.etherscan.io/address/0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4)

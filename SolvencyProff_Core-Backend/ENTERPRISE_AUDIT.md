@@ -53,8 +53,8 @@ const hash = await walletClient.writeContract({
 
 **On-Chain Proof:**
 - TX: `0x9b21f643e6040da3299c743b34642f37cd7b6eda3c640a761d4358d92033496d`
-- Registry: `0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d`
-- Verifier: `0x5e22F8cB0CfbC0df5F2251009674E1266E1D2DD6`
+- Registry: `0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4`
+- Verifier: `0x9e2f50145E2f5299857a33ed937f77DCeD61FBB6`
 - Network: Sepolia Testnet (Chain ID: 11155111)
 
 ---
@@ -127,8 +127,8 @@ const balance = await publicClient.getBalance({ address: addr as `0x${string}` }
 
 | Contract | Address | Verified |
 |----------|---------|----------|
-| Groth16Verifier | `0x5e22F8cB0CfbC0df5F2251009674E1266E1D2DD6` | ✅ |
-| SolvencyProofRegistry | `0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d` | ✅ |
+| Groth16Verifier | `0x9e2f50145E2f5299857a33ed937f77DCeD61FBB6` | ✅ |
+| SolvencyProofRegistry | `0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4` | ✅ |
 
 **Verification:**
 - Groth16Verifier generated from real Powers of Tau ceremony
@@ -196,7 +196,7 @@ const balance = await publicClient.getBalance({ address: addr as `0x${string}` }
 2. **Check On-Chain Proofs:**
    ```bash
    # View on Etherscan
-   https://sepolia.etherscan.io/address/0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d
+   https://sepolia.etherscan.io/address/0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4
    ```
 
 3. **Run Live Transaction Test:**

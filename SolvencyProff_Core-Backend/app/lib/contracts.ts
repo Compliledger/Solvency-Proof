@@ -82,8 +82,8 @@ export const SOLVENCY_REGISTRY_ABI = [
 
 // Deployed contract addresses on Sepolia
 export const DEPLOYED_ADDRESSES = {
-  Groth16Verifier: "0x5e22F8cB0CfbC0df5F2251009674E1266E1D2DD6",
-  SolvencyProofRegistry: "0x7a9f15BCD95FDD20cf31A480f37CAA9b708aB33d",
+  Groth16Verifier: "0x9e2f50145E2f5299857a33ed937f77DCeD61FBB6",
+  SolvencyProofRegistry: "0xC392C0e603f9d86A0Bd2Ab2B46CC1fffcA83E6f4",
   chainId: 11155111,
 };
 
