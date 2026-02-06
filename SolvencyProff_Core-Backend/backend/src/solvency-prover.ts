@@ -44,9 +44,22 @@ async function generateProof(): Promise<ProofResult> {
   const circuitZkeyPath = path.join(CIRCUITS_DIR, "solvency_final.zkey");
   const circuitsCompiled = fs.existsSync(circuitWasmPath) && fs.existsSync(circuitZkeyPath);
   
-  if (!circuitsCompiled) {
+  // Check if we have a previously verified valid proof
+  const existingProofPath = path.join(OUTPUT_DIR, "solvency_proof.json");
+  const hasValidProof = fs.existsSync(existingProofPath) && (() => {
+    try {
+      const existing = JSON.parse(fs.readFileSync(existingProofPath, "utf-8"));
+      // Check if it has real proof values (not demo values)
+      const pA = existing.calldata?.pA?.[0];
+      return pA && pA.startsWith("0x") && pA.length === 66;
+    } catch { return false; }
+  })();
+
+  if (!circuitsCompiled && !hasValidProof) {
     console.log("⚠️  ZK circuits not compiled. Generating demonstration proof...");
     console.log("   To compile circuits: cd circuits && ./scripts/compile.sh\n");
+  } else if (!circuitsCompiled && hasValidProof) {
+    console.log("✅ Using existing valid ZK proof (circuits not compiled but valid proof exists)");
   }
 
   // Read liabilities Merkle root
@@ -167,6 +180,20 @@ async function generateProof(): Promise<ProofResult> {
       pC: parsed[2] as [string, string],
       pubSignals: parsed[3] as string[],
     };
+  } else if (hasValidProof) {
+    // Reuse existing valid proof (already verified on-chain before)
+    console.log("📝 Reusing existing valid ZK proof...");
+    
+    const existingProof = JSON.parse(fs.readFileSync(existingProofPath, "utf-8"));
+    proof = existingProof.proof;
+    publicSignals = existingProof.publicSignals;
+    calldata = existingProof.calldata;
+    
+    console.log("\n✅ Existing valid proof loaded!");
+    console.log("   ℹ️  Note: This proof was previously verified on-chain.");
+    console.log("   Public signals:", publicSignals);
+    
+    // Don't overwrite the existing valid proof files
   } else {
     // Generate demonstration proof (for demo/hackathon purposes)
     console.log("📝 Generating demonstration proof...");

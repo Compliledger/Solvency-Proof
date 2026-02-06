@@ -17,7 +17,37 @@
 
 ---
 
-## 🏆 What Makes SolvencyProof Unique
+## � HackMoney 2026 - Yellow Network Prize Track
+
+This project is submitted for the **Yellow Network $15,000 Prize** at [ETHGlobal HackMoney 2026](https://ethglobal.com).
+
+### How We Qualify
+
+| Requirement | Our Implementation |
+|-------------|-------------------|
+| **Use Yellow SDK / Nitrolite Protocol** | ✅ Integrated Yellow Network state channels for session-based balance management |
+| **Off-chain Transaction Logic** | ✅ Instant, gasless balance updates between on-chain checkpoints |
+| **Smart Contract Settlement** | ✅ Final balances settled on-chain via SolvencyProofRegistry contract |
+| **Working Prototype** | ✅ Fully deployed backend, frontend, and smart contracts |
+| **Demo Video** | ✅ Included in submission |
+
+### Why Yellow Network is Perfect for Solvency Proofs
+
+- **Session-Based Logic**: Users deposit once, make unlimited off-chain balance updates (deposits, withdrawals, trades), then settle on-chain
+- **Gas-Free Updates**: Liability changes happen instantly without blockchain transactions
+- **Web2 Speed, Web3 Security**: User balances update in real-time while smart contracts protect funds
+- **Multi-Chain Ready**: Works with all EVM chains for cross-chain reserve verification
+
+### Yellow Network Integration Points
+
+1. **`/api/yellow/sessions`** - Create and manage state channel sessions
+2. **`/api/yellow/sessions/:id/participants`** - Add users with balances to sessions
+3. **`/api/yellow/sessions/:id/close`** - Finalize session and settle on-chain
+4. **Real-time liability tracking** - Update Merkle tree commitments without gas fees
+
+---
+
+## �🏆 What Makes SolvencyProof Unique
 
 | Feature | Traditional Audit | SolvencyProof | Benefit |
 |---------|-------------------|---------------|---------|

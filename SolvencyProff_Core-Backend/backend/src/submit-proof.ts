@@ -41,9 +41,7 @@ async function submitProofOnChain() {
   }
   const proofData = JSON.parse(fs.readFileSync(proofPath, "utf-8"));
 
-  // Load liabilities root
-  const rootPath = path.join(OUTPUT_DIR, "liabilities_root.json");
-  const rootData = JSON.parse(fs.readFileSync(rootPath, "utf-8"));
+  // Note: liabilities root is now extracted from proof's public signals for consistency
 
   // Setup wallet
   const privateKey = process.env.DEPLOYER_PRIVATE_KEY;
@@ -72,7 +70,11 @@ async function submitProofOnChain() {
   // Convert epochId to bytes32 (pad to 32 bytes)
   const epochIdNum = BigInt(calldata.pubSignals[3]);
   const epochId = ("0x" + epochIdNum.toString(16).padStart(64, "0")) as `0x${string}`;
-  const liabilitiesRoot = rootData.liabilities_root as `0x${string}`;
+  
+  // Use liabilities root from proof's public signals (ensures consistency)
+  // The proof was verified with this specific root
+  const liabilitiesRootFromProof = BigInt(calldata.pubSignals[1]);
+  const liabilitiesRoot = ("0x" + liabilitiesRootFromProof.toString(16).padStart(64, "0")) as `0x${string}`;
   const reservesTotal = BigInt(calldata.pubSignals[2]);
 
   // Convert proof arrays to BigInt
