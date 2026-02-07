@@ -14,6 +14,8 @@ import {
     Trash2,
     Save,
     RefreshCw,
+    FileText,
+    Database,
 } from "lucide-react";
 
 interface Session {
@@ -24,13 +26,17 @@ interface Session {
     createdAt?: string;
 }
 
+// Step tracking for clear UX flow
+type FlowStep = "select" | "add-liabilities" | "review";
+
 export default function YellowSessions() {
     const [sessions, setSessions] = useState<Session[]>([]);
     const [selectedSession, setSelectedSession] = useState<Session | null>(null);
     const [isCreating, setIsCreating] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [newSessionName, setNewSessionName] = useState("Demo Session");
+    const [sessionCreatedMessage, setSessionCreatedMessage] = useState("");
+    const [currentStep, setCurrentStep] = useState<FlowStep>("select");
     const [editingAllocations, setEditingAllocations] = useState<Record<string, string>>({});
     const [newUserId, setNewUserId] = useState("");
     const [newUserBalance, setNewUserBalance] = useState("");
@@ -59,12 +65,15 @@ export default function YellowSessions() {
 
     const handleCreateSession = async () => {
         setIsCreating(true);
+        setSessionCreatedMessage("");
         try {
-            const res = await createYellowSession(["0x0000000000000000000000000000000000000000"]);
+            const res = await createYellowSession([]);
             if (res.session) {
                 setSessions(prev => [...prev, res.session]);
                 setSelectedSession(res.session);
-                setEditingAllocations(res.session.allocations || {});
+                setEditingAllocations({});  // Start with empty allocations
+                setCurrentStep("select");  // Stay on select, show success message
+                setSessionCreatedMessage(`✅ Session created! ID: ${res.session.id.slice(0, 25)}...`);
             }
             await fetchSessions();
         } catch (err) {
@@ -112,7 +121,7 @@ export default function YellowSessions() {
         }));
     };
 
-    const totalLiabilities = Object.values(editingAllocations).reduce((sum, bal) => {
+    const totalLiabilities: number = Object.values(editingAllocations).reduce((sum: number, bal: string) => {
         return sum + (parseInt(bal) || 0);
     }, 0);
 
@@ -173,30 +182,40 @@ export default function YellowSessions() {
                     </div>
                 </SpotlightCard>
 
-                {/* Create Session */}
+                {/* Step 1: Create Session - EMPTY CONTAINER */}
                 <SpotlightCard spotlightColor="rgba(234, 179, 8, 0.1)" className="bg-card/80 border-border">
                     <div className="p-6">
-                        <h3 className="font-medium mb-4">Create New Session</h3>
-                        <div className="flex gap-4">
-                            <input
-                                type="text"
-                                value={newSessionName}
-                                onChange={(e) => setNewSessionName(e.target.value)}
-                                placeholder="Session Name"
-                                className="flex-1 px-4 py-2 rounded-lg bg-secondary/50 border border-border text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/30"
-                            />
-                            <button
-                                onClick={handleCreateSession}
-                                disabled={isCreating}
-                                className="btn-primary bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50"
-                            >
-                                {isCreating ? (
-                                    <Loader2 size={16} className="animate-spin" />
-                                ) : (
-                                    <Plus size={16} />
+                        <div className="flex items-start gap-4">
+                            <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                                <FileText size={24} className="text-yellow-500" />
+                            </div>
+                            <div className="flex-1">
+                                <h3 className="font-medium mb-1">Step 1: Create New Solvency Session</h3>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                    A session is an empty workspace for a point-in-time solvency snapshot. 
+                                    You'll add liabilities in the next step.
+                                </p>
+                                <button
+                                    onClick={handleCreateSession}
+                                    disabled={isCreating}
+                                    className="btn-primary bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50"
+                                >
+                                    {isCreating ? (
+                                        <Loader2 size={16} className="animate-spin" />
+                                    ) : (
+                                        <Plus size={16} />
+                                    )}
+                                    Create Empty Session
+                                </button>
+                                {sessionCreatedMessage && (
+                                    <div className="mt-4 p-3 rounded-lg bg-success/10 border border-success/20 text-success text-sm">
+                                        {sessionCreatedMessage}
+                                        <p className="text-xs mt-1 text-muted-foreground">
+                                            Now select the session below and click "Add Liabilities" to continue.
+                                        </p>
+                                    </div>
                                 )}
-                                Create Session
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </SpotlightCard>
@@ -204,59 +223,98 @@ export default function YellowSessions() {
                 {/* Sessions List */}
                 {sessions.length > 0 && (
                     <div>
-                        <h3 className="font-medium mb-4">Active Sessions</h3>
+                        <h3 className="font-medium mb-4">Your Sessions</h3>
                         <div className="grid gap-4">
-                            {sessions.map((session) => (
-                                <SpotlightCard
-                                    key={session.id}
-                                    spotlightColor="rgba(234, 179, 8, 0.1)"
-                                    className={`bg-card/80 border-border cursor-pointer transition-all ${
-                                        selectedSession?.id === session.id ? "ring-2 ring-yellow-500/50" : ""
-                                    }`}
-                                    onClick={() => {
-                                        setSelectedSession(session);
-                                        setEditingAllocations(session.allocations || {});
-                                    }}
-                                >
-                                    <div className="p-4 flex items-center justify-between">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-lg bg-yellow-500/10">
-                                                <Users size={18} className="text-yellow-500" />
+                            {sessions.map((session) => {
+                                const liabilityCount = Object.keys(session.allocations || {}).length;
+                                const hasLiabilities = liabilityCount > 0;
+                                const sessionStatus = hasLiabilities ? "Has liabilities" : "Awaiting liabilities";
+                                
+                                return (
+                                    <SpotlightCard
+                                        key={session.id}
+                                        spotlightColor="rgba(234, 179, 8, 0.1)"
+                                        className={`bg-card/80 border-border transition-all ${
+                                            selectedSession?.id === session.id ? "ring-2 ring-yellow-500/50" : ""
+                                        }`}
+                                    >
+                                        <div className="p-4">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 rounded-lg bg-yellow-500/10">
+                                                        <Users size={18} className="text-yellow-500" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-mono text-sm">{session.id.slice(0, 30)}...</p>
+                                                        <p className="text-xs text-muted-foreground">
+                                                            Status: <span className={hasLiabilities ? "text-success" : "text-yellow-500"}>
+                                                                {hasLiabilities ? "🟢" : "🟡"} {sessionStatus}
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-sm font-medium">{liabilityCount} users</p>
+                                                    {hasLiabilities && (
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {Object.values(session.allocations || {}).reduce((s, v) => s + (parseInt(v) || 0), 0).toLocaleString()} wei total
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </div>
-                                            <div>
-                                                <p className="font-mono text-sm">{session.id}</p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    Status: <span className="text-success">🟢 {session.status}</span>
-                                                </p>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedSession(session);
+                                                        setEditingAllocations(session.allocations || {});
+                                                        setCurrentStep("add-liabilities");
+                                                    }}
+                                                    className="flex-1 btn-secondary text-sm py-2"
+                                                >
+                                                    <Database size={14} />
+                                                    {hasLiabilities ? "Edit Liabilities" : "Add Liabilities"}
+                                                </button>
+                                                {hasLiabilities && (
+                                                    <Link 
+                                                        to="/liabilities" 
+                                                        className="btn-primary text-sm py-2"
+                                                    >
+                                                        Build Tree →
+                                                    </Link>
+                                                )}
                                             </div>
                                         </div>
-                                        <div className="text-right">
-                                            <p className="text-sm font-medium">
-                                                {Object.keys(session.allocations || {}).length} participants
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">
-                                                {Object.values(session.allocations || {}).reduce((s, v) => s + (parseInt(v) || 0), 0).toLocaleString()} units
-                                            </p>
-                                        </div>
-                                    </div>
-                                </SpotlightCard>
-                            ))}
+                                    </SpotlightCard>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
 
-                {/* Session Detail - Live Balance Editor */}
-                {selectedSession && (
+                {/* Step 2: Add Liabilities - Only shows when explicitly opened */}
+                {selectedSession && currentStep === "add-liabilities" && (
                     <SpotlightCard spotlightColor="rgba(234, 179, 8, 0.15)" className="bg-card/95 border-border">
                         <div className="p-6">
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center justify-between mb-2">
                                 <h3 className="font-medium flex items-center gap-2">
-                                    <Zap size={18} className="text-yellow-500" />
-                                    Live Balance Editor (No Gas Required!)
+                                    <Database size={18} className="text-yellow-500" />
+                                    Step 2: Add Liabilities
                                 </h3>
-                                <span className="text-xs px-2 py-1 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
-                                    Session: {selectedSession.id.slice(0, 20)}...
-                                </span>
+                                <button 
+                                    onClick={() => setCurrentStep("select")}
+                                    className="text-xs px-3 py-1 rounded-full bg-secondary hover:bg-secondary/80 transition-colors"
+                                >
+                                    ← Back to Sessions
+                                </button>
+                            </div>
+                            <p className="text-sm text-muted-foreground mb-6">
+                                Add user balances below. Each balance represents what you OWE that user.
+                                <span className="text-yellow-500 font-medium ml-1">Updates are instant — no gas required!</span>
+                            </p>
+                            <div className="mb-4 p-3 rounded-lg bg-yellow-500/5 border border-yellow-500/20">
+                                <p className="text-xs text-muted-foreground">
+                                    <span className="font-medium text-foreground">Session:</span> {selectedSession.id}
+                                </p>
                             </div>
 
                             {/* Allocations Table */}
@@ -264,8 +322,8 @@ export default function YellowSessions() {
                                 <table className="w-full">
                                     <thead>
                                         <tr className="bg-secondary/30 border-b border-border">
-                                            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">User</th>
-                                            <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Balance</th>
+                                            <th className="text-left text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">User ID</th>
+                                            <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Balance (wei)</th>
                                             <th className="text-right text-xs font-medium text-muted-foreground uppercase tracking-wider px-4 py-3">Actions</th>
                                         </tr>
                                     </thead>
@@ -308,32 +366,43 @@ export default function YellowSessions() {
                             <div className="p-4 rounded-xl bg-secondary/30 border border-border mb-6">
                                 <p className="text-sm font-medium mb-3 flex items-center gap-2">
                                     <Plus size={16} />
-                                    Add New User
+                                    Add User Liability
                                 </p>
                                 <div className="flex gap-3">
-                                    <input
-                                        type="text"
-                                        value={newUserId}
-                                        onChange={(e) => setNewUserId(e.target.value)}
-                                        placeholder="User ID (e.g., dave)"
-                                        className="flex-1 px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/30"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={newUserBalance}
-                                        onChange={(e) => setNewUserBalance(e.target.value)}
-                                        placeholder="Balance (e.g., 100000)"
-                                        className="w-32 px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/30"
-                                    />
-                                    <button
-                                        onClick={handleAddUser}
-                                        disabled={!newUserId.trim() || !newUserBalance.trim()}
-                                        className="btn-secondary disabled:opacity-50"
-                                    >
-                                        <Plus size={16} />
-                                        Add
-                                    </button>
+                                    <div className="flex-1">
+                                        <label className="text-xs text-muted-foreground mb-1 block">User ID (or hashed ID)</label>
+                                        <input
+                                            type="text"
+                                            value={newUserId}
+                                            onChange={(e) => setNewUserId(e.target.value)}
+                                            placeholder="e.g., alice, user_001, 0x123..."
+                                            className="w-full px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/30"
+                                        />
+                                    </div>
+                                    <div className="w-40">
+                                        <label className="text-xs text-muted-foreground mb-1 block">Balance (wei)</label>
+                                        <input
+                                            type="text"
+                                            value={newUserBalance}
+                                            onChange={(e) => setNewUserBalance(e.target.value)}
+                                            placeholder="e.g., 150000000000000000"
+                                            className="w-full px-3 py-2 rounded-lg bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500/30"
+                                        />
+                                    </div>
+                                    <div className="flex items-end">
+                                        <button
+                                            onClick={handleAddUser}
+                                            disabled={!newUserId.trim() || !newUserBalance.trim()}
+                                            className="btn-secondary disabled:opacity-50"
+                                        >
+                                            <Plus size={16} />
+                                            Add
+                                        </button>
+                                    </div>
                                 </div>
+                                <p className="text-xs text-muted-foreground mt-2">
+                                    💡 1 ETH = 1000000000000000000 wei (18 zeros)
+                                </p>
                             </div>
 
                             {/* Summary */}
@@ -341,11 +410,14 @@ export default function YellowSessions() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Liabilities</p>
-                                        <p className="font-display text-2xl font-semibold">{totalLiabilities.toLocaleString()} units</p>
+                                        <p className="font-display text-2xl font-semibold">{totalLiabilities.toLocaleString()} wei</p>
+                                        <p className="text-xs text-muted-foreground">≈ {(Number(totalLiabilities) / 1e18).toFixed(6)} ETH</p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="text-xs text-muted-foreground">Last Update</p>
-                                        <p className="text-sm text-success">Just now (no tx needed!)</p>
+                                        <p className="text-xs text-muted-foreground">Update Status</p>
+                                        <p className="text-sm text-success flex items-center gap-1 justify-end">
+                                            <Zap size={12} /> Instant (no gas!)
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -362,10 +434,10 @@ export default function YellowSessions() {
                                     ) : (
                                         <Save size={16} />
                                     )}
-                                    Save Changes
+                                    Save Liabilities
                                 </button>
                                 <Link to="/liabilities" className="btn-primary">
-                                    Build Merkle Tree
+                                    Step 3: Build Merkle Tree
                                     <ArrowRight size={16} />
                                 </Link>
                             </div>

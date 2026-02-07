@@ -1,5 +1,5 @@
 {
-  "passed": 19,
+  "passed": 20,
   "failed": 0,
   "warnings": 5,
   "tests": [
@@ -8,11 +8,11 @@
       "endpoint": "/health",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 2103.22,
+      "elapsed_ms": 1347.03,
       "success": true,
       "response": {
         "status": "ok",
-        "timestamp": "2026-02-06T19:46:23.110Z"
+        "timestamp": "2026-02-06T20:01:46.221Z"
       }
     },
     {
@@ -20,7 +20,7 @@
       "endpoint": "/api/liabilities",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 1543.82,
+      "elapsed_ms": 848.51,
       "success": true,
       "response": {
         "root": "0x934005bfbce16c8b6bbd708da0bf62f4a4693a2edf158679aea36bb3916dd312",
@@ -35,7 +35,7 @@
       "endpoint": "/api/liabilities/build",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 3407.5,
+      "elapsed_ms": 2323.98,
       "success": true,
       "response": {
         "success": true,
@@ -54,7 +54,7 @@
       "endpoint": "/api/liabilities/verify/alice",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 2497.11,
+      "elapsed_ms": 2319.63,
       "success": true,
       "response": {
         "success": true,
@@ -67,7 +67,7 @@
       "endpoint": "/api/liabilities/verify/unknown_user_xyz",
       "method": "GET",
       "status_code": 404,
-      "elapsed_ms": 2652.15,
+      "elapsed_ms": 2061.53,
       "success": true,
       "response": {
         "error": "User not found",
@@ -79,22 +79,22 @@
       "endpoint": "/api/reserves",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 761.84,
+      "elapsed_ms": 788.68,
       "success": true,
       "response": {
         "epoch_id": "epoch_001",
-        "timestamp": 1770130145091,
+        "timestamp": 1770407221218,
         "chain": "sepolia",
         "chain_id": 11155111,
         "addresses": [
           {
             "address": "0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E",
-            "balance": "0.355711576363123007",
-            "balanceWei": "355711576363123007"
+            "balance": "0.349348069787651697",
+            "balanceWei": "349348069787651697"
           }
         ],
-        "reserves_total": "0.355711576363123007",
-        "reserves_total_wei": "355711576363123007"
+        "reserves_total": "0.349348069787651697",
+        "reserves_total_wei": "349348069787651697"
       }
     },
     {
@@ -102,27 +102,27 @@
       "endpoint": "/api/reserves/scan",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 3317.28,
+      "elapsed_ms": 3737.31,
       "success": true,
       "response": {
         "success": true,
         "message": "Reserves scanned successfully",
         "data": {
           "epoch_id": "epoch_001",
-          "timestamp": 1770407197404,
+          "timestamp": 1770408118157,
           "chain": "sepolia",
           "chain_id": 11155111,
           "addresses": [
             {
               "address": "0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E",
-              "balance": "0.349348069787651697",
-              "balanceWei": "349348069787651697"
+              "balance": "0.348908704696687993",
+              "balanceWei": "348908704696687993"
             }
           ],
-          "reserves_total": "0.349348069787651697",
-          "reserves_total_wei": "349348069787651697"
+          "reserves_total": "0.348908704696687993",
+          "reserves_total_wei": "348908704696687993"
         },
-        "output": "\ud83d\udce6 SolvencyProof: Reserves Scanner\n\n\ud83d\udccd Scanning 1 reserve address(es) on Sepolia\n\n   Using RPC: https://1rpc.io/sepolia\n   0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E: 0.349348069787651697 ETH\n\n\ud83d\udcb0 Total Reserves: 0.349348069787651697 ETH\n   (349348069787651697 wei)\n\n\u2705 Saved reserves_snapshot.json\n\n\ud83c\udf89 Reserves scan complete!\n"
+        "output": "\ud83d\udce6 SolvencyProof: Reserves Scanner\n\n\ud83d\udccd Scanning 1 reserve address(es) on Sepolia\n\n   Using RPC: https://1rpc.io/sepolia\n   0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E: 0.348908704696687993 ETH\n\n\ud83d\udcb0 Total Reserves: 0.348908704696687993 ETH\n   (348908704696687993 wei)\n\n\u2705 Saved reserves_snapshot.json\n\n\ud83c\udf89 Reserves scan complete!\n"
       }
     },
     {
@@ -130,23 +130,23 @@
       "endpoint": "/api/proof",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 963.01,
+      "elapsed_ms": 619.16,
       "success": true,
       "response": {
         "proof": {
           "pi_a": [
-            "13840910365814601662162947179321860320178737824362711841390208082913417434223",
-            "6972294779632946468896589762651553738521823372935088482067846780033231648031",
+            "4282042920646677229540985849064382354998295682845380521410019887822972581764",
+            "631448603049533681415953110727289435540005115006818242201953679876155467160",
             "1"
           ],
           "pi_b": [
             [
-              "21111257176753983675769556097743130680300180767246502226159147100721511889270",
-              "16639161571497319568703241300810802308622028178513271208048801601805583108594"
+              "2274280830774702436798508705283397481294056500947097532244225441510976245124",
+              "5960463398508726520510991109859040889838091423390913287492345970001811588907"
             ],
             [
-              "7909572658420077594439372745748655024724320106090208603976401050584504245312",
-              "3287013225593532479708125642270129679207847908531661728292566370014461935892"
+              "21606259379638762056090680265947242471010379170857786441770401504927101572152",
+              "6104487597741363563994495034513214590109120198376064018365031352637621285739"
             ],
             [
               "1",
@@ -154,8 +154,8 @@
             ]
           ],
           "pi_c": [
-            "2027980582658023390667278050538057894876183164734578823271113169309226538671",
-            "3054806457623342730770985293755337802553815396758925903786766413907342786772",
+            "14825989600048308154392625853289474362606764156246275602852360351853825292403",
+            "2059379263307324668754630164753690878291688760945800300376749723951776620895",
             "1"
           ],
           "protocol": "groth16",
@@ -163,34 +163,34 @@
         },
         "publicSignals": [
           "1",
-          "10402619206166364393997169141620422006090302576193742179882619882788992420952",
-          "355711576363123007",
-          "1770149094"
+          "938378016341142289329670516893878077864878173092222063212547671625630077711",
+          "349348069787651697",
+          "1770407222"
         ],
         "calldata": {
           "pA": [
-            "0x1e99ad7a9994e2fcc74369a6e51834aa94db78cbb594a5400bcb200a3f0b146f",
-            "0x0f6a2dd2cf697ad0d660b293688c3d794e72f879f8bcbe7bac700bc3d416751f"
+            "0x09778ce763406dafdbc496ce202bb529d95fea859b08bfd312120d040d6af784",
+            "0x016563226c38e45c8c73d130613ec379551629b03003b06f06a79c4cea736598"
           ],
           "pB": [
             [
-              "0x24c96e846ecbbe581ba1ff5c25863be1eff42d6635574a272d75ad7f74d7c9f2",
-              "0x2eac8c51b006735f7d62c6d6d7393d55f6e1dad8f2995c486a82b8b592477976"
+              "0x0d2d80b2fca94ac733a2b6270142295f4f1a6272fb18f0ac68d657bedf7bc72b",
+              "0x0507328475810a4f0374513686d87efe2a245f4eb7aafc06090d7637842dcd84"
             ],
             [
-              "0x07446230bcd4f26b5e887200e557633807736103a4d072709c249669f57fc114",
-              "0x117ca8d38a098ad876724f802ae619449b84ca74606ef1a4c5d6669e2a769c40"
+              "0x0d7f047d7180ec80a1ec993cec111de801720d73d52295aae105aaa89d04336b",
+              "0x2fc4b59dd7d16502a6f3a10cfa22d34cc6c833341b2dcfec5c3957ce11dd5438"
             ]
           ],
           "pC": [
-            "0x047bcbdc81b6f5f2e2ecb63721d49189f8abd08c917fa5a4bdfe5d4db52896af",
-            "0x06c0f58d048c059e0962dc000d90eee1d3038765861e7942255262a63e7e00d4"
+            "0x20c7367625305df52c51217781aceecaf95ffd760da534c6edc396929178f873",
+            "0x048d913e4cf2966ef417b7ef1b790e196916f29bed48f6296435ed9e879f615f"
           ],
           "pubSignals": [
             "0x0000000000000000000000000000000000000000000000000000000000000001",
-            "0x16ffac7f6d7ea6bfba46a805d363b4d1f3392ec5900abe6dd5cfe295aead8c58",
-            "0x00000000000000000000000000000000000000000000000004efbdcb479e413f",
-            "0x00000000000000000000000000000000000000000000000000000000698254e6"
+            "0x02131a67194c8c0e42cc9f6a1c3b59dd2bcd815571e934c5e2fd8af7c16dd30f",
+            "0x00000000000000000000000000000000000000000000000004d92237f2a94e71",
+            "0x0000000000000000000000000000000000000000000000000000000069864536"
           ]
         }
       }
@@ -200,13 +200,13 @@
       "endpoint": "/api/proof/generate",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 10752.56,
+      "elapsed_ms": 8261.57,
       "success": true,
       "response": {
         "success": true,
         "message": "Proof generated successfully",
         "data": {},
-        "output": "\ud83d\udd10 Generating Solvency ZK Proof...\n\n\ud83d\udcca Liabilities:\n   Root: 0x934005bfbce16c8b6b...\n   Total: 300000000000000000\n\n\ud83d\udcb0 Reserves:\n   Total Wei: 349348069787651697\n\n\u2705 Solvency verified: Reserves >= Liabilities\n   Surplus: 49348069787651697 wei\n\n\ud83d\udcdd Circuit input written to: /app/circuits/build/input.json\n\n\u2699\ufe0f  Generating witness...\n\n\ud83d\udd2e Generating Groth16 proof...\n\n\u2705 Proof generated successfully!\n   Public signals: [\n  '1',\n  '938378016341142289329670516893878077864878173092222063212547671625630077711',\n  '349348069787651697',\n  '1770407200'\n]\n\n\ud83d\udd0d Verifying proof locally...\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: OK!\n\u2705 Local verification passed!\n\n\ud83d\udce6 Generating Solidity calldata...\n\n\ud83d\udcbe Complete proof saved to: /app/data/output/solvency_proof.json\n\n==================================================\nSOLVENCY PROOF SUMMARY\n==================================================\nEpoch ID:          1770407200\nLiabilities Root:  0x934005bfbce16c8b6b...\nReserves Total:    349348069787651697 wei\nLiabilities Total: 300000000000000000 (private)\nisSolvent:         YES \u2705\n==================================================\n\n\ud83c\udf89 Proof generation complete!\n"
+        "output": "\ud83d\udd10 Generating Solvency ZK Proof...\n\n\ud83d\udcca Liabilities:\n   Root: 0x934005bfbce16c8b6b...\n   Total: 300000000000000000\n\n\ud83d\udcb0 Reserves:\n   Total Wei: 348908704696687993\n\n\u2705 Solvency verified: Reserves >= Liabilities\n   Surplus: 48908704696687993 wei\n\n\ud83d\udcdd Circuit input written to: /app/circuits/build/input.json\n\n\u2699\ufe0f  Generating witness...\n\n\ud83d\udd2e Generating Groth16 proof...\n\n\u2705 Proof generated successfully!\n   Public signals: [\n  '1',\n  '938378016341142289329670516893878077864878173092222063212547671625630077711',\n  '348908704696687993',\n  '1770408120'\n]\n\n\ud83d\udd0d Verifying proof locally...\n\u001b[32;22m[INFO]  \u001b[39;1msnarkJS\u001b[0m: OK!\n\u2705 Local verification passed!\n\n\ud83d\udce6 Generating Solidity calldata...\n\n\ud83d\udcbe Complete proof saved to: /app/data/output/solvency_proof.json\n\n==================================================\nSOLVENCY PROOF SUMMARY\n==================================================\nEpoch ID:          1770408120\nLiabilities Root:  0x934005bfbce16c8b6b...\nReserves Total:    348908704696687993 wei\nLiabilities Total: 300000000000000000 (private)\nisSolvent:         YES \u2705\n==================================================\n\n\ud83c\udf89 Proof generation complete!\n"
       }
     },
     {
@@ -214,7 +214,7 @@
       "endpoint": "/api/contracts",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 795.43,
+      "elapsed_ms": 828.29,
       "success": true,
       "response": {
         "network": "sepolia",
@@ -231,10 +231,10 @@
       "endpoint": "/api/contracts/epoch-count",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 1153.72,
+      "elapsed_ms": 1844.24,
       "success": true,
       "response": {
-        "epochCount": 0
+        "epochCount": 1
       }
     },
     {
@@ -242,7 +242,7 @@
       "endpoint": "/api/contracts/proof/1",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 872.69,
+      "elapsed_ms": 1049.14,
       "success": true,
       "response": {
         "epochId": "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -258,13 +258,13 @@
       "endpoint": "/api/yellow/status",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 941.37,
+      "elapsed_ms": 910.17,
       "success": true,
       "response": {
         "connected": false,
         "authenticated": false,
-        "sessionsCount": 0,
-        "totalOpenLiabilities": "0"
+        "sessionsCount": 1,
+        "totalOpenLiabilities": "3000"
       }
     },
     {
@@ -272,12 +272,21 @@
       "endpoint": "/api/yellow/sessions",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 796.9,
+      "elapsed_ms": 767.78,
       "success": true,
       "response": {
-        "sessions": [],
-        "count": 0,
-        "totalOpenLiabilities": "0"
+        "sessions": [
+          {
+            "id": "session_1770407214424_v4zi25501",
+            "channelId": "0x2600d83046bc0f702c0989912e461ba5cd9040f96906a83ffdcbad17aefd3258",
+            "status": "open",
+            "participantCount": 3,
+            "nonce": 1,
+            "createdAt": "2026-02-06T19:46:54.424Z"
+          }
+        ],
+        "count": 1,
+        "totalOpenLiabilities": "3000"
       }
     },
     {
@@ -285,14 +294,14 @@
       "endpoint": "/api/yellow/session",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 606.22,
+      "elapsed_ms": 791.17,
       "success": true,
       "response": {
         "success": true,
         "message": "Yellow session created (state channel opened)",
         "session": {
-          "id": "session_1770407214424_v4zi25501",
-          "channelId": "0x2600d83046bc0f702c0989912e461ba5cd9040f96906a83ffdcbad17aefd3258",
+          "id": "session_1770408133243_khqoejodx",
+          "channelId": "0x4b5eff64c0498f680f0e52267ddc055c091ba349caa0bda3a97ec168fef4c4bb",
           "participants": [
             "0x1234567890123456789012345678901234567890"
           ],
@@ -300,22 +309,22 @@
             "0x1234567890123456789012345678901234567890": "0"
           },
           "status": "open",
-          "stateHash": "0xc4fc105ae86c271fd3e654c6f8ed87cd44d75126987bcff37cfef495ff6f1f3b",
+          "stateHash": "0x929b72d6c5d81dd6d41d379c822bc9d6e7c7d2dd5a934ecfcdf3dd67c7e65981",
           "nonce": 0,
-          "createdAt": "2026-02-06T19:46:54.424Z"
+          "createdAt": "2026-02-06T20:02:13.243Z"
         }
       }
     },
     {
       "name": "Get Session Details",
-      "endpoint": "/api/yellow/session/session_1770407214424_v4zi25501",
+      "endpoint": "/api/yellow/session/session_1770408133243_khqoejodx",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 834.89,
+      "elapsed_ms": 1028.38,
       "success": true,
       "response": {
-        "id": "session_1770407214424_v4zi25501",
-        "channelId": "0x2600d83046bc0f702c0989912e461ba5cd9040f96906a83ffdcbad17aefd3258",
+        "id": "session_1770408133243_khqoejodx",
+        "channelId": "0x4b5eff64c0498f680f0e52267ddc055c091ba349caa0bda3a97ec168fef4c4bb",
         "participants": [
           "0x1234567890123456789012345678901234567890"
         ],
@@ -324,12 +333,12 @@
         },
         "nonce": 0,
         "status": "open",
-        "stateHash": "0xc4fc105ae86c271fd3e654c6f8ed87cd44d75126987bcff37cfef495ff6f1f3b",
+        "stateHash": "0x929b72d6c5d81dd6d41d379c822bc9d6e7c7d2dd5a934ecfcdf3dd67c7e65981",
         "signatures": {
-          "0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E": "0xdaa0671af924a4c8d67df6cfaf112744afda8e73c8116bdf433579f199907c7c10307f5868bd2bf88313cb14032d34401443b2d594190248d8b655e3d96577141c"
+          "0xa58DCCb0F17279abD1d0D9069Aa8711Df4a4c58E": "0xfc2dedc12ca968df62f6d4c44a83e058414befb2d04808314ae10bfcd2389eda29c443ba122b81463296042c7c095e25e5b6f15f1f033332ea2c62ea15b548eb1c"
         },
-        "createdAt": "2026-02-06T19:46:54.424Z",
-        "updatedAt": "2026-02-06T19:46:54.424Z",
+        "createdAt": "2026-02-06T20:02:13.243Z",
+        "updatedAt": "2026-02-06T20:02:13.243Z",
         "metadata": {
           "version": 1,
           "turnNum": 0,
@@ -339,51 +348,51 @@
     },
     {
       "name": "Update Allocations",
-      "endpoint": "/api/yellow/session/session_1770407214424_v4zi25501/allocations",
+      "endpoint": "/api/yellow/session/session_1770408133243_khqoejodx/allocations",
       "method": "PUT",
       "status_code": 200,
-      "elapsed_ms": 541.26,
+      "elapsed_ms": 617.98,
       "success": true,
       "response": {
         "success": true,
         "message": "Allocations updated off-chain (nonce: 1)",
         "session": {
-          "id": "session_1770407214424_v4zi25501",
+          "id": "session_1770408133243_khqoejodx",
           "allocations": {
             "0x1234567890123456789012345678901234567890": "0",
             "user1": "1000",
             "user2": "2000"
           },
           "nonce": 1,
-          "stateHash": "0x5b74635e0b4b4ed24c9f13200a5272cb70112d3ff436818961dcc4231555a875",
+          "stateHash": "0xf7caff6af7336e12227e5de36a6ce566320622f4809d2083dc4079e318452c89",
           "status": "open",
-          "updatedAt": "2026-02-06T19:46:55.829Z"
+          "updatedAt": "2026-02-06T20:02:15.077Z"
         }
       }
     },
     {
       "name": "Get Session History",
-      "endpoint": "/api/yellow/session/session_1770407214424_v4zi25501/history",
+      "endpoint": "/api/yellow/session/session_1770408133243_khqoejodx/history",
       "method": "GET",
       "status_code": 200,
-      "elapsed_ms": 755.23,
+      "elapsed_ms": 1159.75,
       "success": true,
       "response": {
-        "sessionId": "session_1770407214424_v4zi25501",
+        "sessionId": "session_1770408133243_khqoejodx",
         "history": [
           {
-            "timestamp": "2026-02-06T19:46:54.439Z",
+            "timestamp": "2026-02-06T20:02:13.246Z",
             "nonce": 0,
-            "stateHash": "0xc4fc105ae86c271fd3e654c6f8ed87cd44d75126987bcff37cfef495ff6f1f3b",
+            "stateHash": "0x929b72d6c5d81dd6d41d379c822bc9d6e7c7d2dd5a934ecfcdf3dd67c7e65981",
             "allocations": {
               "0x1234567890123456789012345678901234567890": "0"
             },
             "status": "open"
           },
           {
-            "timestamp": "2026-02-06T19:46:55.834Z",
+            "timestamp": "2026-02-06T20:02:15.080Z",
             "nonce": 1,
-            "stateHash": "0x5b74635e0b4b4ed24c9f13200a5272cb70112d3ff436818961dcc4231555a875",
+            "stateHash": "0xf7caff6af7336e12227e5de36a6ce566320622f4809d2083dc4079e318452c89",
             "allocations": {
               "0x1234567890123456789012345678901234567890": "0",
               "user1": "1000",
@@ -396,11 +405,122 @@
       }
     },
     {
+      "name": "Yellow Stress Demo",
+      "endpoint": "/api/yellow/stress-demo",
+      "method": "POST",
+      "status_code": 200,
+      "elapsed_ms": 12047.26,
+      "success": true,
+      "response": {
+        "success": true,
+        "message": "Yellow Network stress demo completed",
+        "summary": {
+          "description": "Simulated high-frequency liability events via Yellow state channels",
+          "yellowValue": "All balance updates were INSTANT and ZERO-GAS via off-chain state channels",
+          "workflow": "Yellow sessions \u2192 Export \u2192 Merkle tree \u2192 ZK proof \u2192 On-chain verification"
+        },
+        "session": {
+          "id": "session_1770408137086_71p89y4oi",
+          "channelId": "0x093ae712d7db0d9a6cb459ff356233dbef0574541b7d73295d64367cd4aa5d8a",
+          "totalUpdates": 5,
+          "finalAllocations": {
+            "user_alice": "23202214424621512",
+            "user_bob": "27425263862424576",
+            "user_charlie": "31784377805082072"
+          },
+          "stateHash": "0x1b398bf4eba1cfa29909b7e0bc1b7358bc0b33c68bc2982c4459f5ebcdaccad8"
+        },
+        "solvency": {
+          "liabilitiesTotal": "82411856092128160",
+          "reservesTotal": "348908704696687993",
+          "isSolvent": true
+        },
+        "proof": {
+          "generated": true,
+          "epochId": "0x00000000000000000000000000000000000000000000000000000000698648ce"
+        },
+        "submission": null,
+        "performance": {
+          "totalTimeMs": 11207,
+          "avgUpdateTimeMs": 2241.4,
+          "events": [
+            {
+              "action": "start",
+              "timestamp": 1770408137086,
+              "details": "Yellow stress demo initiated"
+            },
+            {
+              "action": "session_created",
+              "timestamp": 1770408137089,
+              "details": "Channel 0x093ae712d7db0d... opened with 3 participants"
+            },
+            {
+              "action": "liability_updates",
+              "timestamp": 1770408137102,
+              "details": "5 off-chain state transitions completed (zero gas cost)"
+            },
+            {
+              "action": "export_liabilities",
+              "timestamp": 1770408137105,
+              "details": "Session state exported to /app/data/liabilities.csv"
+            },
+            {
+              "action": "merkle_built",
+              "timestamp": 1770408138671,
+              "details": "Liabilities Merkle tree constructed"
+            },
+            {
+              "action": "reserves_scanned",
+              "timestamp": 1770408141338,
+              "details": "On-chain reserve balances fetched"
+            },
+            {
+              "action": "proof_generated",
+              "timestamp": 1770408148293,
+              "details": "Groth16 ZK solvency proof created"
+            }
+          ]
+        },
+        "updateLog": [
+          {
+            "user": "user_alice",
+            "oldBalance": "0",
+            "newBalance": "15409582772175136",
+            "nonce": 1
+          },
+          {
+            "user": "user_bob",
+            "oldBalance": "0",
+            "newBalance": "28247256979054028",
+            "nonce": 2
+          },
+          {
+            "user": "user_alice",
+            "oldBalance": "0",
+            "newBalance": "23202214424621512",
+            "nonce": 3
+          },
+          {
+            "user": "user_bob",
+            "oldBalance": "0",
+            "newBalance": "27425263862424576",
+            "nonce": 4
+          },
+          {
+            "user": "user_charlie",
+            "oldBalance": "0",
+            "newBalance": "31784377805082072",
+            "nonce": 5
+          }
+        ]
+      }
+    },
+    {
       "name": "Full Workflow",
       "endpoint": "/api/workflow/full",
       "method": "POST",
       "status_code": 200,
-      "elapsed_ms": 29929.32,
+      "elapsed_ms": 27733.36,
       "success": true,
       "response": {
         "success": true,
@@ -416,14 +536,14 @@
           "\u2713 Proof submitted on-chain"
         ],
         "submission": {
-          "txHash": "0xb5c80eca0f2ad8b779c8b37043ce5fb705fc548f33b56e2210da37393d731d2f",
-          "blockNumber": "10205614",
-          "gasUsed": "400306",
-          "epochId": "0x0000000000000000000000000000000000000000000000000000000069864536",
-          "liabilitiesRoot": "0x02131a67194c8c0e42cc9f6a1c3b59dd2bcd815571e934c5e2fd8af7c16dd30f",
-          "reservesTotal": "349348069787651697",
+          "txHash": "0x0f5fa9037c9ecde65ce4d7bb7a45b33c80a30bfed8f429cbdb027af6f682d8d9",
+          "blockNumber": "10205688",
+          "gasUsed": "383194",
+          "epochId": "0x00000000000000000000000000000000000000000000000000000000698648d9",
+          "liabilitiesRoot": "0x134e14af479ad57330eceabad3c79a73e9830c0f7a27b2ac3101df698817f658",
+          "reservesTotal": "348908704696687993",
           "verified": true,
-          "timestamp": "2026-02-06T19:47:26.472Z"
+          "timestamp": "2026-02-06T20:02:55.925Z"
         }
       }
     }
