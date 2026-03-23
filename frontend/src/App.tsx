@@ -11,8 +11,11 @@ import HowItWorks from "./pages/HowItWorks";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/app/Login";
 
-// Verifier Pages (Protected - Auth Required)
+// Core Portal Pages (Protected - Auth Required)
 import Dashboard from "./pages/app/Dashboard";
+import AdminDashboard from "./pages/app/AdminDashboard";
+import PublicDashboard from "./pages/app/PublicDashboard";
+import UserVerification from "./pages/app/UserVerification";
 import ReportsList from "./pages/app/ReportsList";
 import ReportDetail from "./pages/app/ReportDetail";
 import InclusionCheck from "./pages/app/InclusionCheck";
@@ -41,6 +44,11 @@ const App = () => (
             <Route path="/login" element={<Login />} />
 
             {/* Protected Routes - Require Authentication */}
+            {/* New architecture routes */}
+            <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/solvency" element={<ProtectedRoute><PublicDashboard /></ProtectedRoute>} />
+            <Route path="/verify-inclusion" element={<ProtectedRoute><UserVerification /></ProtectedRoute>} />
+            {/* Legacy routes kept for backward compat */}
             <Route path="/verify" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/proofs" element={<ProtectedRoute><ReportsList /></ProtectedRoute>} />
             <Route path="/proofs/:id" element={<ProtectedRoute><ReportDetail /></ProtectedRoute>} />
@@ -54,10 +62,10 @@ const App = () => (
             <Route path="/summary" element={<ProtectedRoute><Summary /></ProtectedRoute>} />
 
             {/* Legacy redirects (Protected) */}
-            <Route path="/app" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/app/reports" element={<ProtectedRoute><ReportsList /></ProtectedRoute>} />
+            <Route path="/app" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/app/reports" element={<ProtectedRoute><PublicDashboard /></ProtectedRoute>} />
             <Route path="/app/reports/:id" element={<ProtectedRoute><ReportDetail /></ProtectedRoute>} />
-            <Route path="/app/inclusion" element={<ProtectedRoute><InclusionCheck /></ProtectedRoute>} />
+            <Route path="/app/inclusion" element={<ProtectedRoute><UserVerification /></ProtectedRoute>} />
 
             {/* Catch-all */}
             <Route path="*" element={<NotFound />} />
