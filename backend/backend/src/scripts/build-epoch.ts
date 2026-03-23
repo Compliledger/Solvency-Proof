@@ -22,7 +22,7 @@ import { fileURLToPath } from "url";
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import { buildSolvencyEpochObject } from "../engine/epoch_builder.js";
 import {
-  toAlgorandSolvencyRegistryPayload,
+  toAlgorandSolventRegistryPayload,
   writeAlgorandPayload,
 } from "../algorand/adapter_payload.js";
 
@@ -48,7 +48,7 @@ async function main(): Promise<void> {
     reservesPath,
   });
 
-  const payload = toAlgorandSolvencyRegistryPayload(epoch);
+  const payload = toAlgorandSolventRegistryPayload(epoch);
 
   if (!existsSync(OUTPUT_DIR)) {
     mkdirSync(OUTPUT_DIR, { recursive: true });

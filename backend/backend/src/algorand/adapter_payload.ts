@@ -1,41 +1,24 @@
 import { writeFileSync, mkdirSync, existsSync } from "fs";
 import path from "path";
 import type { SolvencyEpochObject } from "../types/epoch.js";
+import type { AlgorandAdapterPayload } from "./adapter_types.js";
+
+export type { AlgorandAdapterPayload };
 
 /**
- * Normalized payload shape for the shared compliledger-algorand-adapter.
- * Fields are serialized as strings where on-chain ABI requires it.
+ * Builds the normalized Algorand adapter payload from a canonical
+ * SolvencyEpochObject.
  *
- * Note: on-chain submission is out of scope for Phase 2 MVP.
- * This payload is written to disk and will later be picked up by the adapter.
- */
-export interface AlgorandSolvencyPayload {
-  entity_id: string;
-  epoch_id: number;
-  liability_root: string;
-  reserve_root: string;
-  reserve_snapshot_hash: string;
-  proof_hash: string;
-  reserves_total: string;
-  liquid_assets_total: string;
-  near_term_liabilities_total: string;
-  capital_backed: boolean;
-  liquidity_ready: boolean;
-  health_status: string;
-  timestamp: number;
-  valid_until: number;
-  adapter_version: string;
-}
-
-/**
- * Builds the normalized Algorand payload from a canonical SolvencyEpochObject.
+ * SolvencyProof is the source of truth for all solvency computations.
+ * This function translates the canonical epoch object into the hand-off
+ * payload consumed by the external compliledger-algorand-adapter.
  *
- * Numeric totals are coerced to strings to accommodate ABI encoding constraints
- * for large integers.
+ * Numeric totals are coerced to strings to accommodate ABI encoding
+ * constraints for large integers (the adapter converts them to micro-units).
  */
-export function toAlgorandSolvencyRegistryPayload(
+export function toAlgorandSolventRegistryPayload(
   epoch: SolvencyEpochObject
-): AlgorandSolvencyPayload {
+): AlgorandAdapterPayload {
   return {
     entity_id: epoch.entity_id,
     epoch_id: epoch.epoch_id,
@@ -56,10 +39,10 @@ export function toAlgorandSolvencyRegistryPayload(
 }
 
 /**
- * Writes the Algorand payload to `data/output/latest_epoch.json`.
+ * Writes the Algorand adapter payload to `{outputDir}/latest_epoch.json`.
  */
 export function writeAlgorandPayload(
-  payload: AlgorandSolvencyPayload,
+  payload: AlgorandAdapterPayload,
   outputDir: string
 ): void {
   if (!existsSync(outputDir)) {
