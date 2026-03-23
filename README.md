@@ -1,12 +1,12 @@
 # SolvencyProof
 
-> Continuous Solvency + Liquidity Verification for Digital Financial Systems
+> Continuous Solvency + Liquidity Verification for Tokenized Financial Systems
 
 ---
 
 ## What SolvencyProof Does
 
-SolvencyProof continuously verifies and enforces two critical financial health conditions for digital financial systems:
+SolvencyProof continuously verifies and enforces two critical financial health conditions for tokenized financial systems:
 
 - **Capital Backing**: Total reserves >= total liabilities — the system holds enough assets to cover all obligations.
 - **Liquidity Readiness**: Liquid assets >= near-term obligations — the system can meet upcoming payment demands without needing to liquidate long-term holdings.
