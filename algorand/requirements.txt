@@ -1,0 +1,8 @@
+# Python dependencies for the Algorand Solvent Registry contract
+#
+# Install with:  pip install -r requirements.txt
+# Run tests with: pytest algorand/tests/test_solvent_registry.py -v
+
+pyteal>=0.20.1
+py-algorand-sdk>=2.5.0
+pytest>=8.0.0
