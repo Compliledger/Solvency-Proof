@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
+import rateLimit from "express-rate-limit";
 import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
@@ -43,9 +44,44 @@ async function createPublicClientWithFallback() {
 const app = express();
 const PORT = process.env.PORT || process.env.API_PORT || 3001;
 
+// ============================================
+// Rate Limiting
+// ============================================
+
+// Global limiter: applied to all routes
+const globalLimiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? "", 10) || 15 * 60 * 1000, // default 15 min
+  max: parseInt(process.env.RATE_LIMIT_MAX ?? "", 10) || 100, // default 100 req / window
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  handler: (_req: Request, res: Response) => {
+    res.status(429).json({
+      error: "Too Many Requests",
+      message: "You have exceeded the request rate limit. Please try again later.",
+      retryAfter: res.getHeader("Retry-After"),
+    });
+  },
+});
+
+// Strict limiter for verify-stored (on-chain RPC call – expensive)
+const verifyStoredLimiter = rateLimit({
+  windowMs: parseInt(process.env.VERIFY_STORED_RATE_LIMIT_WINDOW_MS ?? "", 10) || 15 * 60 * 1000, // default 15 min
+  max: parseInt(process.env.VERIFY_STORED_RATE_LIMIT_MAX ?? "", 10) || 10, // default 10 req / window
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  handler: (_req: Request, res: Response) => {
+    res.status(429).json({
+      error: "Too Many Requests",
+      message: "You have exceeded the rate limit for on-chain verification. Please try again later.",
+      retryAfter: res.getHeader("Retry-After"),
+    });
+  },
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(globalLimiter);
 
 // Data directories
 const DATA_DIR = path.join(__dirname, "../../../data");
@@ -1055,7 +1091,7 @@ app.get("/api/epoch/health", (req: Request, res: Response) => {
 });
 
 // GET /api/epoch/verify-stored?entity_id=<entityId>&epoch_id=<epochId>
-app.get("/api/epoch/verify-stored", async (req: Request, res: Response) => {
+app.get("/api/epoch/verify-stored", verifyStoredLimiter, async (req: Request, res: Response) => {
   const entityId = req.query.entity_id as string | undefined;
   const rawEpochId = req.query.epoch_id as string | undefined;
 
