@@ -888,6 +888,318 @@ app.post("/api/workflow/full", async (_req: Request, res: Response) => {
 });
 
 // ============================================
+// Epoch State Endpoints
+// ============================================
+
+type EpochHealthStatus =
+  | "HEALTHY"
+  | "LIQUIDITY_STRESSED"
+  | "UNDERCOLLATERALIZED"
+  | "CRITICAL"
+  | "EXPIRED";
+
+interface NormalizedEpochState {
+  entity_id: string;
+  epoch_id: number;
+  liability_root: string;
+  reserve_root?: string;
+  reserve_snapshot_hash?: string;
+  proof_hash: string;
+  reserves_total: string;
+  total_liabilities?: string;
+  near_term_liabilities_total: string;
+  liquid_assets_total: string;
+  capital_backed: boolean;
+  liquidity_ready: boolean;
+  health_status: EpochHealthStatus;
+  timestamp: number;
+  valid_until: number;
+  anchored_at?: number;
+  adapter_version?: string;
+  source_type: string;
+}
+
+/**
+ * Normalises a raw epoch_id value to a plain integer.
+ *
+ * The older liabilities builder uses string identifiers such as "epoch_001",
+ * while the newer engine writes plain numbers.  Both forms are handled:
+ *   - number  → returned as-is
+ *   - "42"    → parseInt → 42
+ *   - "epoch_001" → strip non-digits → parseInt("001") → 1
+ */
+function parseEpochId(raw: unknown): number {
+  if (typeof raw === "number") return raw;
+  const s = String(raw ?? "0");
+  if (/^\d+$/.test(s)) return parseInt(s, 10);
+  const digits = s.replace(/\D/g, "");
+  return digits.length > 0 ? parseInt(digits, 10) : 0;
+}
+
+/**
+ * Reads all available output files and assembles a NormalizedEpochState
+ * for the given entity.  Returns null when the mandatory liabilities_root.json
+ * has not been built yet.
+ */
+function buildEpochStateFromFiles(entityId: string): NormalizedEpochState | null {
+  const liabRootPath  = path.join(OUTPUT_DIR, "liabilities_root.json");
+  const liabTotalPath = path.join(OUTPUT_DIR, "liabilities_total.json");
+  const reservesPath  = path.join(OUTPUT_DIR, "reserves_snapshot.json");
+  const proofPath     = path.join(OUTPUT_DIR, "solvency_proof.json");
+  const submissionPath = path.join(OUTPUT_DIR, "submission_result.json");
+
+  if (!fs.existsSync(liabRootPath)) return null;
+
+  const liabRoot  = JSON.parse(fs.readFileSync(liabRootPath,  "utf-8"));
+  const liabTotal = fs.existsSync(liabTotalPath) ? JSON.parse(fs.readFileSync(liabTotalPath, "utf-8")) : null;
+  const reserves  = fs.existsSync(reservesPath)  ? JSON.parse(fs.readFileSync(reservesPath,  "utf-8")) : null;
+  const proof     = fs.existsSync(proofPath)     ? JSON.parse(fs.readFileSync(proofPath,     "utf-8")) : null;
+  const submission = fs.existsSync(submissionPath) ? JSON.parse(fs.readFileSync(submissionPath, "utf-8")) : null;
+
+  // Normalise epoch_id — handles number, "42", and "epoch_001" formats
+  const numericId = parseEpochId(liabRoot.epoch_id);
+
+  // Monetary amounts — reserves_snapshot uses wei strings; liabilities use raw strings
+  const reservesTotalWei: string  = reserves?.reserves_total_wei  ?? "0";
+  const totalLiabilities: string  = liabTotal?.liabilities_total  ?? "0";
+  // Near-term = total liabilities (worst-case; no bucket data available yet)
+  const nearTermLiabilities: string = totalLiabilities;
+  // All on-chain reserves counted as liquid (no illiquid-asset data yet)
+  const liquidAssetsTotal: string = reservesTotalWei;
+
+  let capitalBacked  = false;
+  let liquidityReady = false;
+  try {
+    capitalBacked  = BigInt(reservesTotalWei) >= BigInt(totalLiabilities);
+    liquidityReady = BigInt(liquidAssetsTotal) >= BigInt(nearTermLiabilities);
+  } catch {
+    // Non-parseable amounts — remain false
+  }
+
+  let healthStatus: EpochHealthStatus;
+  if      (capitalBacked  && liquidityReady)  healthStatus = "HEALTHY";
+  else if (capitalBacked  && !liquidityReady) healthStatus = "LIQUIDITY_STRESSED";
+  else if (!capitalBacked && liquidityReady)  healthStatus = "UNDERCOLLATERALIZED";
+  else                                        healthStatus = "CRITICAL";
+
+  // liabilities_root.json stores timestamp in milliseconds (Date.now())
+  const rawTs: number = liabRoot.timestamp ?? Date.now();
+  const timestamp = rawTs > 1e10 ? Math.floor(rawTs / 1000) : rawTs;
+  const validUntil = timestamp + 86400; // 24-hour validity window
+
+  // Mark expired if current time is past valid_until
+  const now = Math.floor(Date.now() / 1000);
+  if (now > validUntil) healthStatus = "EXPIRED";
+
+  // proof_hash: prefer publicSignals from the proof file, else use liability root
+  const proofHash: string =
+    (proof?.publicSignals && Array.isArray(proof.publicSignals) && proof.publicSignals.length >= 2)
+      ? String(proof.publicSignals[1])   // publicSignals[1] = liabilitiesRoot (see solvency-prover.ts)
+      : (liabRoot.liabilities_root ?? "0x0");
+
+  // anchored_at is set if a submission result exists (on-chain tx was recorded)
+  const anchoredAt: number | undefined = submission?.timestamp
+    ? (submission.timestamp > 1e10 ? Math.floor(submission.timestamp / 1000) : submission.timestamp)
+    : undefined;
+
+  return {
+    entity_id:                   entityId,
+    epoch_id:                    numericId,
+    liability_root:              liabRoot.liabilities_root ?? "",
+    proof_hash:                  proofHash,
+    reserves_total:              reservesTotalWei,
+    total_liabilities:           totalLiabilities,
+    near_term_liabilities_total: nearTermLiabilities,
+    liquid_assets_total:         liquidAssetsTotal,
+    capital_backed:              capitalBacked,
+    liquidity_ready:             liquidityReady,
+    health_status:               healthStatus,
+    timestamp,
+    valid_until:                 validUntil,
+    anchored_at:                 anchoredAt,
+    source_type:                 "backend",
+  };
+}
+
+// ----------------------------------------------------------------
+// NOTE: specific routes must be declared BEFORE /:entityId to avoid
+// Express matching "health" or "verify-stored" as an entity ID.
+// ----------------------------------------------------------------
+
+// GET /api/epoch/health?entity_id=<entityId>
+app.get("/api/epoch/health", (req: Request, res: Response) => {
+  const entityId = req.query.entity_id as string | undefined;
+  if (!entityId) {
+    return res.status(400).json({ error: "entity_id query parameter is required" });
+  }
+
+  try {
+    const state = buildEpochStateFromFiles(entityId);
+    if (!state) {
+      return res.status(404).json({ error: "No epoch state found for entity", entity_id: entityId });
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    return res.json({
+      entity_id:     state.entity_id,
+      health_status: state.health_status,
+      is_healthy:    state.health_status === "HEALTHY",
+      is_fresh:      now <= state.valid_until,
+      valid_until:   state.valid_until,
+      timestamp:     state.timestamp,
+    });
+  } catch (err: unknown) {
+    const error = err as Error;
+    return res.status(500).json({ error: "Failed to read epoch health", details: error.message });
+  }
+});
+
+// GET /api/epoch/verify-stored?entity_id=<entityId>&epoch_id=<epochId>
+app.get("/api/epoch/verify-stored", async (req: Request, res: Response) => {
+  const entityId = req.query.entity_id as string | undefined;
+  const rawEpochId = req.query.epoch_id as string | undefined;
+
+  if (!entityId) {
+    return res.status(400).json({ error: "entity_id query parameter is required" });
+  }
+  if (!rawEpochId) {
+    return res.status(400).json({ error: "epoch_id query parameter is required" });
+  }
+  const epochId = parseInt(rawEpochId, 10);
+  if (Number.isNaN(epochId)) {
+    return res.status(400).json({ error: "epoch_id must be a valid integer" });
+  }
+
+  try {
+    const state = buildEpochStateFromFiles(entityId);
+
+    // If no local state: nothing to verify
+    if (!state) {
+      return res.status(404).json({
+        exists:     false,
+        matches:    false,
+        mismatches: [],
+        record:     null,
+      });
+    }
+
+    // Call the Algorand adapter to check what is stored on-chain
+    const { createAlgorandAdapterClient } = await import("../algorand/adapter_client.js");
+    const adapterClient = createAlgorandAdapterClient();
+    const adapterResult = await adapterClient.verifyStoredRecord(entityId, epochId);
+
+    // exists: true when the adapter confirms an on-chain record OR when the
+    // locally persisted epoch matches the requested ID (the epoch was generated
+    // locally but may not yet have been submitted to the Algorand registry).
+    const exists  = adapterResult.verified || state.epoch_id === epochId;
+    // matches: only true when the adapter cryptographically confirms the record
+    const matches = adapterResult.verified;
+
+    return res.json({
+      exists,
+      matches,
+      mismatches: matches ? [] : (adapterResult.message ? [adapterResult.message] : []),
+      record: exists ? state : null,
+    });
+  } catch (err: unknown) {
+    const error = err as Error;
+    return res.status(500).json({ error: "Failed to verify stored record", details: error.message });
+  }
+});
+
+// GET /api/epoch/latest?entity_id=<entityId>
+app.get("/api/epoch/latest", (req: Request, res: Response) => {
+  const entityId = (req.query.entity_id as string | undefined) ?? "default";
+  try {
+    const state = buildEpochStateFromFiles(entityId);
+    if (!state) {
+      return res.status(404).json({ error: "No epoch state found — run the full workflow first" });
+    }
+    return res.json(state);
+  } catch (err: unknown) {
+    const error = err as Error;
+    return res.status(500).json({ error: "Failed to read epoch state", details: error.message });
+  }
+});
+
+// GET /api/epoch/history?entity_id=<entityId>
+// Currently only the latest epoch is persisted to disk.
+// Returns a single-element array; historical epochs require a datastore.
+app.get("/api/epoch/history", (req: Request, res: Response) => {
+  const entityId = (req.query.entity_id as string | undefined) ?? "default";
+  try {
+    const state = buildEpochStateFromFiles(entityId);
+    if (!state) {
+      return res.json([]);
+    }
+    return res.json([state]);
+  } catch (err: unknown) {
+    const error = err as Error;
+    return res.status(500).json({ error: "Failed to read epoch history", details: error.message });
+  }
+});
+
+// GET /api/epoch/:entityId               → latest state for entity
+// GET /api/epoch/:entityId?epochId=<n>   → specific epoch record for entity
+app.get("/api/epoch/:entityId", async (req: Request, res: Response) => {
+  const entityId   = req.params.entityId as string;
+  const rawEpochId = req.query.epochId as string | undefined;
+
+  try {
+    const state = buildEpochStateFromFiles(entityId);
+
+    // When a specific epochId is requested, validate it matches
+    if (rawEpochId !== undefined) {
+      const epochId = parseInt(rawEpochId, 10);
+      if (Number.isNaN(epochId)) {
+        return res.status(400).json({ error: "epochId must be a valid integer" });
+      }
+
+      if (!state) {
+        // Try the Algorand adapter as a fallback
+        const { createAlgorandAdapterClient } = await import("../algorand/adapter_client.js");
+        const adapterClient = createAlgorandAdapterClient();
+        const adapterState  = await adapterClient.getLatestState(entityId);
+        if (!adapterState || adapterState.epoch_id !== epochId) {
+          return res.status(404).json({
+            error:    "Epoch not found",
+            entity_id: entityId,
+            epoch_id:  epochId,
+          });
+        }
+        // Normalise adapter payload into NormalizedEpochState shape
+        const now = Math.floor(Date.now() / 1000);
+        return res.json({
+          ...adapterState,
+          is_fresh: now <= adapterState.valid_until,
+          source_type: "algorand-adapter",
+        });
+      }
+
+      if (state.epoch_id !== epochId) {
+        return res.status(404).json({
+          error:    "Epoch not found",
+          entity_id: entityId,
+          epoch_id:  epochId,
+        });
+      }
+    }
+
+    if (!state) {
+      return res.status(404).json({
+        error:    "No epoch state found for entity — run the full workflow first",
+        entity_id: entityId,
+      });
+    }
+
+    return res.json(state);
+  } catch (err: unknown) {
+    const error = err as Error;
+    return res.status(500).json({ error: "Failed to read epoch state", details: error.message });
+  }
+});
+
+// ============================================
 // Error Handler
 // ============================================
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
@@ -936,6 +1248,12 @@ app.listen(Number(PORT), HOST, () => {
 ║  POST /api/yellow/stress-demo    - Yellow stress demo         ║
 ║  ─────────────────────────────────────────────────────────────║
 ║  POST /api/workflow/full         - Run complete workflow      ║
+║  ─────────────────────────────────────────────────────────────║
+║  GET  /api/epoch/health          - Entity health status       ║
+║  GET  /api/epoch/verify-stored   - Verify on-chain record     ║
+║  GET  /api/epoch/latest          - Latest epoch state         ║
+║  GET  /api/epoch/history         - Epoch history              ║
+║  GET  /api/epoch/:entityId       - Entity epoch (+ ?epochId)  ║
 ╚═══════════════════════════════════════════════════════════════╝
 `);
 });
