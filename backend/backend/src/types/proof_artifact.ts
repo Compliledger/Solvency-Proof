@@ -11,16 +11,19 @@
  * Shape:
  *   module              – always "solvency"
  *   entity_id           – reporting entity identifier
- *   rule_version_used   – adapter_version from the epoch object
+ *   rule_version_used   – policy_version (from CompliPolicy) or adapter_version fallback
  *   decision_result     – health_status string (HEALTHY / LIQUIDITY_STRESSED / …)
  *   evaluation_context  – numeric inputs used for the health decision
  *   reason_codes        – machine-readable reason codes derived from the evaluation
  *   timestamp           – Unix timestamp (seconds) of epoch generation
  *   bundle_hash         – proof_hash (deterministic SHA-256 commitment)
  *   anchor_metadata     – populated after on-chain submission
+ *   policy_lineage      – "<jurisdiction>/<policy_version>" from CompliPolicy
+ *   rule_snapshot_hash  – deterministic SHA-256 hash of the active CompliPolicy
  */
 
 import type { SolvencyEpochObject } from "./epoch.js";
+import type { RuleSnapshot } from "../complistate/rule_snapshot.js";
 
 // ============================================================
 // TYPES
@@ -60,7 +63,7 @@ export interface UniversalProofArtifact {
   module: "solvency";
   /** Reporting entity identifier */
   entity_id: string;
-  /** Adapter/rule version used to produce this artifact */
+  /** Policy or adapter version used to produce this artifact */
   rule_version_used: string;
   /** Health decision result (HEALTHY / LIQUIDITY_STRESSED / UNDERCOLLATERALIZED / CRITICAL) */
   decision_result: string;
@@ -74,6 +77,18 @@ export interface UniversalProofArtifact {
   bundle_hash: string;
   /** On-chain anchor metadata (populated after submission) */
   anchor_metadata: AnchorMetadata;
+  /**
+   * Human-readable policy lineage string from the active CompliPolicy.
+   * Format: "<jurisdiction>/<policy_version>" — e.g. "GLOBAL/1.0.0".
+   * Undefined when no CompliPolicy was loaded during evaluation.
+   */
+  policy_lineage?: string;
+  /**
+   * Deterministic SHA-256 commitment hash over the canonical CompliPolicy fields.
+   * Allows verifiers to confirm exactly which rules produced this decision.
+   * Undefined when no CompliPolicy was loaded during evaluation.
+   */
+  rule_snapshot_hash?: string;
 }
 
 // ============================================================
@@ -105,15 +120,17 @@ function deriveReasonCodes(
  *
  * @param epoch         - Canonical epoch object produced by the backend engine
  * @param anchorMetadata - Optional on-chain anchor details (populated after submit)
+ * @param ruleSnapshot  - Optional CompliState rule snapshot (policy lineage + hash)
  */
 export function toUniversalProofArtifact(
   epoch: SolvencyEpochObject,
-  anchorMetadata: AnchorMetadata = {}
+  anchorMetadata: AnchorMetadata = {},
+  ruleSnapshot?: RuleSnapshot
 ): UniversalProofArtifact {
   return {
     module:            "solvency",
     entity_id:         epoch.entity_id,
-    rule_version_used: epoch.adapter_version,
+    rule_version_used: ruleSnapshot?.policy_version ?? epoch.adapter_version,
     decision_result:   epoch.health_status,
     evaluation_context: {
       reserves_total:              epoch.reserves_total,
@@ -123,9 +140,11 @@ export function toUniversalProofArtifact(
       capital_backed:              epoch.capital_backed,
       liquidity_ready:             epoch.liquidity_ready,
     },
-    reason_codes:    deriveReasonCodes(epoch.capital_backed, epoch.liquidity_ready),
-    timestamp:       epoch.timestamp,
-    bundle_hash:     epoch.proof_hash,
-    anchor_metadata: anchorMetadata,
+    reason_codes:      deriveReasonCodes(epoch.capital_backed, epoch.liquidity_ready),
+    timestamp:         epoch.timestamp,
+    bundle_hash:       epoch.proof_hash,
+    anchor_metadata:   anchorMetadata,
+    policy_lineage:    ruleSnapshot?.policy_lineage,
+    rule_snapshot_hash: ruleSnapshot?.rule_snapshot_hash,
   };
 }
