@@ -30,6 +30,8 @@ import {
     Hash,
     Tag,
     XCircle,
+    Shield,
+    Droplets,
 } from "lucide-react";
 
 function HashRow({ label, value }: { label: string; value: string | undefined }) {
@@ -220,6 +222,76 @@ export default function AdminDashboard() {
                             <HashRow label="Liability Root" value={epochState.liability_root} />
                             <HashRow label="Reserve Root" value={epochState.reserve_root} />
                             <HashRow label="Reserve Snapshot Hash" value={epochState.reserve_snapshot_hash} />
+                {epochState && (
+                    <>
+                        {/* Top-level epoch info */}
+                        <SpotlightCard spotlightColor="rgba(74, 222, 128, 0.1)" className="bg-card/80 border-border animate-fade-in">
+                            <div className="p-6 space-y-4">
+                                <div className="flex flex-wrap items-center gap-3">
+                                    <Activity size={20} className="text-accent" />
+                                    <span className="font-display text-lg font-semibold">
+                                        Epoch #{epochState.epoch_id}
+                                    </span>
+                                    <HealthStatusBadge status={epochState.health_status} />
+                                    {epochState.entity_id && (
+                                        <span className="text-xs text-muted-foreground">
+                                            Entity: <span className="font-mono">{epochState.entity_id}</span>
+                                        </span>
+                                    )}
+                                </div>
+
+                                <FreshnessIndicator
+                                    timestamp={epochState.timestamp}
+                                    validUntil={epochState.valid_until}
+                                />
+
+                                <div className="grid gap-3 pt-2">
+                                    <HashRow label="Bundle Hash" value={epochState.bundle_hash} />
+                                    <HashRow label="Liability Root" value={epochState.liability_root} />
+                                    <HashRow label="Reserve Root" value={epochState.reserve_root} />
+                                    <HashRow label="Reserve Snapshot Hash" value={epochState.reserve_snapshot_hash} />
+                                </div>
+                            </div>
+                        </SpotlightCard>
+
+                        {/* Reason codes */}
+                        {epochState.reason_codes && epochState.reason_codes.length > 0 && (
+                            <div className="rounded-xl border border-border bg-card/50 p-5 space-y-3 animate-fade-in">
+                                <div className="flex items-center gap-2">
+                                    <Tag size={15} className="text-accent" />
+                                    <h2 className="font-medium text-sm">Reason Codes</h2>
+                                </div>
+                                <ReasonCodesList codes={epochState.reason_codes} />
+                            </div>
+                        )}
+
+                        {/* Capital & Liquidity — distinct sections */}
+                        <div className="grid md:grid-cols-2 gap-6 animate-fade-in">
+                            {/* Capital Position */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <Shield size={15} className="text-green-500" />
+                                    <h2 className="font-medium text-sm text-green-500">Capital Position</h2>
+                                </div>
+                                <CapitalStateCard
+                                    reservesTotal={epochState.reserves_total}
+                                    totalLiabilities={epochState.total_liabilities}
+                                    capitalBacked={epochState.capital_backed}
+                                />
+                            </div>
+
+                            {/* Liquidity Position */}
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <Droplets size={15} className="text-purple-500" />
+                                    <h2 className="font-medium text-sm text-purple-500">Liquidity Position</h2>
+                                </div>
+                                <LiquidityStateCard
+                                    liquidAssetsTotal={epochState.liquid_assets_total}
+                                    nearTermLiabilitiesTotal={epochState.near_term_liabilities_total}
+                                    liquidityReady={epochState.liquidity_ready}
+                                />
+                            </div>
                         </div>
                     </div>
                 </SpotlightCard>
