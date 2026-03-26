@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { getLatestEpoch, getEpochHistory } from "@/lib/api/backend";
 import type { SolvencyEpochState, EpochHistoryItem, HealthStatus } from "@/lib/types";
+import { buildAnchorFallback } from "@/lib/types";
 import { DataSourceBanner } from "@/components/DataSourceBanner";
 import { ReasonCodesList, AnchorMetadataCard } from "@/components/solvency";
 
@@ -458,10 +459,7 @@ export default function PublicDashboard() {
 
                     {/* Anchor metadata */}
                     <div className="animate-fade-in">
-                        <AnchorMetadataCard anchor={epoch.anchor_metadata ?? (epoch.anchored_at ? {
-                            anchored_at: epoch.anchored_at,
-                            network: "testnet",
-                        } : null)} />
+                        <AnchorMetadataCard anchor={epoch.anchor_metadata ?? buildAnchorFallback(epoch.anchored_at)} />
                     </div>
 
                     {/* Epoch history */}

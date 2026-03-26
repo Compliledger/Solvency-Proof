@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { verifyUserInclusion, verifyStoredRecord } from "@/lib/api/backend";
 import type { UserInclusionResult, VerificationResult } from "@/lib/types";
+import { buildAnchorFallback } from "@/lib/types";
 import { DataSourceBanner } from "@/components/DataSourceBanner";
 import { ReasonCodesList, AnchorMetadataCard } from "@/components/solvency";
 
@@ -731,10 +732,7 @@ export default function UserVerification({
                                             {/* Anchor metadata */}
                                             {(recResult.record.anchor_metadata || recResult.record.anchored_at) && (
                                                 <AnchorMetadataCard
-                                                    anchor={recResult.record.anchor_metadata ?? {
-                                                        anchored_at: recResult.record.anchored_at,
-                                                        network: "testnet",
-                                                    }}
+                                                    anchor={recResult.record.anchor_metadata ?? buildAnchorFallback(recResult.record.anchored_at)}
                                                 />
                                             )}
                                         </div>

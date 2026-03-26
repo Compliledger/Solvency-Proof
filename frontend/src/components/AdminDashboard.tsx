@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { getLatestEpoch, triggerRefresh, submitToRegistry } from "@/lib/api/backend";
 import type { SolvencyEpochState, HealthStatus } from "@/lib/types";
+import { buildAnchorFallback } from "@/lib/types";
 import { DataSourceBanner } from "@/components/DataSourceBanner";
 import { ReasonCodesList, AnchorMetadataCard } from "@/components/solvency";
 
@@ -391,10 +392,7 @@ export default function AdminDashboard({ entityId }: AdminDashboardProps) {
                     <Activity size={16} className="text-muted-foreground" />
                     Algorand Anchor
                 </h2>
-                <AnchorMetadataCard anchor={epoch.anchor_metadata ?? (epoch.anchored_at ? {
-                    anchored_at: epoch.anchored_at,
-                    network: "testnet",
-                } : null)} />
+                <AnchorMetadataCard anchor={epoch.anchor_metadata ?? buildAnchorFallback(epoch.anchored_at)} />
             </div>
 
             {/* Metadata */}

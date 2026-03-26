@@ -207,9 +207,9 @@ function normaliseEpochState(raw: Record<string, unknown>): EpochState {
         capital_backed: bool(raw.capital_backed ?? raw.capitalBacked ?? false),
         liquidity_ready: bool(raw.liquidity_ready ?? raw.liquidityReady ?? false),
         health_status: sanitiseHealthStatus(raw.health_status ?? raw.healthStatus),
-        timestamp: numOrZero(raw.timestamp),
-        valid_until: numOrZero(raw.valid_until ?? raw.validUntil),
-        anchored_at: raw.anchored_at != null ? numOrZero(raw.anchored_at) : undefined,
+        timestamp: parseTimestampOrZero(raw.timestamp),
+        valid_until: parseTimestampOrZero(raw.valid_until ?? raw.validUntil),
+        anchored_at: raw.anchored_at != null ? parseTimestampOrZero(raw.anchored_at) : undefined,
         rule_version_used: raw.rule_version_used != null ? str(raw.rule_version_used) : undefined,
         reason_codes: Array.isArray(raw.reason_codes) ? (raw.reason_codes as string[]) : undefined,
     };
@@ -223,11 +223,11 @@ function normaliseEpochSummary(raw: Record<string, unknown>): EpochSummary {
         health_status: sanitiseHealthStatus(raw.health_status ?? raw.healthStatus ?? (raw.verified ? 'HEALTHY' : 'EXPIRED')),
         bundle_hash: bundleHash,
         proof_hash: bundleHash,
-        timestamp: numOrZero(raw.timestamp),
-        valid_until: numOrZero(raw.valid_until ?? raw.validUntil),
+        timestamp: parseTimestampOrZero(raw.timestamp),
+        valid_until: parseTimestampOrZero(raw.valid_until ?? raw.validUntil),
         capital_backed: bool(raw.capital_backed ?? raw.capitalBacked ?? false),
         liquidity_ready: bool(raw.liquidity_ready ?? raw.liquidityReady ?? false),
-        anchored_at: raw.anchored_at != null ? numOrZero(raw.anchored_at) : undefined,
+        anchored_at: raw.anchored_at != null ? parseTimestampOrZero(raw.anchored_at) : undefined,
     };
 }
 
@@ -255,7 +255,12 @@ function num(v: unknown): number {
     return isNaN(n) ? 0 : n;
 }
 
-function numOrZero(v: unknown): number {
+/**
+ * Parses a raw value as a Unix timestamp (seconds).
+ * Accepts both numeric Unix seconds and ISO-8601 strings.
+ * Returns 0 when the value is null / undefined / unparseable.
+ */
+function parseTimestampOrZero(v: unknown): number {
     if (v == null) return 0;
     // Accept numeric Unix timestamp directly
     const n = Number(v);

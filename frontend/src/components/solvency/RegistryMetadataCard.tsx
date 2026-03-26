@@ -1,5 +1,6 @@
 import { Link2, Hash, ExternalLink } from 'lucide-react';
 import type { AnchorMetadata } from '@/lib/types';
+import { hasValidTimestamp } from '@/lib/types';
 import { getAlgorandTxUrl, getAlgorandAppUrl } from '@/lib/api/constants';
 
 interface RegistryMetadataCardProps {
@@ -63,7 +64,7 @@ export function RegistryMetadataCard({ anchor, className = '' }: RegistryMetadat
                         </a>
                     </div>
                 )}
-                {anchor.anchored_at !== undefined && anchor.anchored_at > 0 && (
+                {hasValidTimestamp(anchor.anchored_at) && (
                     <div className="col-span-2">
                         <p className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">Anchored On-Chain</p>
                         <p className="text-xs">{formatDate(anchor.anchored_at)}</p>

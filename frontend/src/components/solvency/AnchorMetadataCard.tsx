@@ -4,6 +4,7 @@
 
 import { Anchor, ExternalLink, Hash, Network } from 'lucide-react';
 import type { AnchorMetadata } from '@/lib/types';
+import { hasValidTimestamp } from '@/lib/types';
 import { getAlgorandTxUrl, getAlgorandAppUrl } from '@/lib/api/constants';
 
 interface AnchorMetadataCardProps {
@@ -50,7 +51,7 @@ export function AnchorMetadataCard({ anchor, className = '' }: AnchorMetadataCar
             </div>
 
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-                {anchor.anchored_at !== undefined && anchor.anchored_at > 0 && (
+                {hasValidTimestamp(anchor.anchored_at) && (
                     <div>
                         <dt className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">
                             Anchored At

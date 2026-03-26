@@ -14,6 +14,7 @@ import {
     submitEpochToRegistry,
 } from "@/services/solvencyService";
 import type { EpochState } from "@/types/solvency";
+import { buildAnchorFallback } from "@/lib/types";
 import {
     HealthStatusBadge,
     FreshnessIndicator,
@@ -243,10 +244,7 @@ export default function AdminDashboard() {
                                 <Hash size={16} className="text-muted-foreground" />
                                 <h2 className="font-medium text-sm">Algorand Anchor</h2>
                             </div>
-                            <RegistryMetadataCard anchor={epochState.anchored_at ? {
-                                anchored_at: epochState.anchored_at,
-                                network: "testnet",
-                            } : null} />
+                            <RegistryMetadataCard anchor={buildAnchorFallback(epochState.anchored_at)} />
                         </div>
                     </>
                 )}

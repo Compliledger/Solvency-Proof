@@ -140,3 +140,26 @@ export interface UserInclusionResult {
     /** Unix timestamp (seconds) when the inclusion check was performed */
     checked_at: number;
 }
+
+// ---------------------------------------------------------------------------
+// Utility helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns true when `unixSeconds` is a valid, positive Unix timestamp.
+ * Used by display components to guard against missing or zero-value timestamps.
+ */
+export function hasValidTimestamp(unixSeconds: number | undefined): unixSeconds is number {
+    return typeof unixSeconds === 'number' && unixSeconds > 0;
+}
+
+/**
+ * Builds a minimal AnchorMetadata object for display when only `anchored_at`
+ * is available (i.e. the full anchor_metadata field is absent from the response).
+ *
+ * Returns `null` when there is no valid anchor timestamp.
+ */
+export function buildAnchorFallback(anchored_at: number | undefined): AnchorMetadata | null {
+    if (!hasValidTimestamp(anchored_at)) return null;
+    return { anchored_at, network: 'testnet' };
+}

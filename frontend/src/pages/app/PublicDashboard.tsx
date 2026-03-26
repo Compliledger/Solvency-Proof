@@ -10,6 +10,7 @@ import { useState, useEffect, useCallback } from "react";
 import { PortalLayout } from "@/components/portal/PortalLayout";
 import { getLatestEpoch, getEpochHistory, getEpochRecord } from "@/lib/api/backend";
 import type { SolvencyEpochState, EpochHistoryItem } from "@/lib/types";
+import { buildAnchorFallback } from "@/lib/types";
 import {
     HealthStatusBadge,
     FreshnessIndicator,
@@ -242,10 +243,7 @@ export default function PublicDashboard() {
                                 <Hash size={16} className="text-muted-foreground" />
                                 <h2 className="font-medium">Algorand Anchor</h2>
                             </div>
-                            <RegistryMetadataCard anchor={displayedEpoch.anchor_metadata ?? (displayedEpoch.anchored_at ? {
-                                anchored_at: displayedEpoch.anchored_at,
-                                network: "testnet",
-                            } : null)} />
+                            <RegistryMetadataCard anchor={displayedEpoch.anchor_metadata ?? buildAnchorFallback(displayedEpoch.anchored_at)} />
                         </div>
                     </>
                 )}
