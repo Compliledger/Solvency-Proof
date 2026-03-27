@@ -188,26 +188,31 @@ app.post("/api/liabilities/upload", (req: Request, res: Response) => {
 app.get("/api/liabilities/verify/:userId", async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId as string;
-    const { execSync } = await import("child_process");
+    const inclusionProofsDir = path.join(OUTPUT_DIR, "inclusion_proofs");
+    const proofPath = path.join(inclusionProofsDir, `inclusion_${userId}.json`);
 
-    const result = execSync(`npx tsx src/verify-inclusion.ts ${userId}`, {
-      cwd: path.join(__dirname, "../.."),
-      encoding: "utf-8",
-    });
+    if (!fs.existsSync(proofPath)) {
+      return res.status(404).json({ 
+        success: false,
+        error: "User not found", 
+        details: `No inclusion proof exists for user: ${userId}` 
+      });
+    }
+
+    const proof = JSON.parse(fs.readFileSync(proofPath, "utf-8"));
 
     res.json({
       success: true,
-      userId,
-      output: result,
+      userId: proof.userId,
+      balance: proof.balance,
+      root: proof.root,
+      proof: proof.proof,
+      leafHash: proof.leafHash,
+      index: proof.index,
     });
   } catch (err: unknown) {
     const error = err as Error;
-    // Return 404 if proof not found for user
-    if (error.message.includes("not found") || error.message.includes("Inclusion proof not found")) {
-      res.status(404).json({ error: "User not found", details: `No inclusion proof exists for user: ${req.params.userId}` });
-    } else {
-      res.status(500).json({ error: "Verification failed", details: error.message });
-    }
+    res.status(500).json({ error: "Verification failed", details: error.message });
   }
 });
 
@@ -225,7 +230,7 @@ app.get("/api/reserves", (_req: Request, res: Response) => {
     }
 
     const snapshot = JSON.parse(fs.readFileSync(snapshotPath, "utf-8"));
-    res.json(snapshot);
+    res.json({ snapshot });
   } catch (err) {
     res.status(500).json({ error: "Failed to read reserves data" });
   }
@@ -324,7 +329,7 @@ app.post("/api/proof/generate", async (_req: Request, res: Response) => {
   }
 });
 
-// POST /api/proof/submit - Submit proof on-chain
+// POST /api/proof/submit - Submit proof on-chain (Ethereum - Legacy)
 app.post("/api/proof/submit", async (_req: Request, res: Response) => {
   try {
     const { execSync } = await import("child_process");
@@ -353,6 +358,40 @@ app.post("/api/proof/submit", async (_req: Request, res: Response) => {
   } catch (err: unknown) {
     const error = err as Error;
     res.status(500).json({ error: "Failed to submit proof", details: error.message });
+  }
+});
+
+// POST /api/proof/submit-algorand - Submit epoch to Algorand SolventRegistry
+app.post("/api/proof/submit-algorand", async (_req: Request, res: Response) => {
+  try {
+    const { execSync } = await import("child_process");
+    const result = execSync("npx tsx src/scripts/submit-to-algorand.ts", {
+      cwd: path.join(__dirname, "../.."),
+      encoding: "utf-8",
+      timeout: 120000,
+    });
+
+    const submissionPath = path.join(OUTPUT_DIR, "algorand_submission.json");
+    if (fs.existsSync(submissionPath)) {
+      const submission = JSON.parse(fs.readFileSync(submissionPath, "utf-8"));
+      res.json({
+        success: true,
+        message: "Epoch submitted to Algorand",
+        tx_id: submission.tx_id,
+        app_id: submission.app_id,
+        network: submission.network,
+        data: submission,
+      });
+    } else {
+      res.json({
+        success: true,
+        message: "Epoch submitted to Algorand",
+        output: result,
+      });
+    }
+  } catch (err: unknown) {
+    const error = err as Error;
+    res.status(500).json({ error: "Failed to submit to Algorand", details: error.message });
   }
 });
 

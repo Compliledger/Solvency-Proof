@@ -23,22 +23,6 @@
  */
 
 import type { SolvencyEpochObject } from "./epoch.js";
-import type { RuleSnapshot } from "../complistate/rule_snapshot.js";
- *   rule_version_used   – adapter_version from the epoch object
- *   marketproof_status  – ADMITTED / NOT_ADMITTED from the MarketProof check
- *   decision_result     – health_status string (HEALTHY / LIQUIDITY_STRESSED / …)
- *   evaluation_context  – numeric inputs used for the health decision
- *   reason_codes        – machine-readable reason codes (MarketProof + financial)
- *   decision_result     – { capital_backed, liquidity_ready, health_status }
- *   evaluation_context  – numeric inputs + context used for the health decision
- *   reason_codes        – machine-readable reason codes derived from the evaluation
- *   timestamp           – Unix timestamp (seconds) of epoch generation
- *   bundle_hash         – proof_hash (deterministic SHA-256 commitment)
- *   anchor_metadata     – { anchored, network, application_id, transaction_id, anchored_at }
- */
-
-import type { SolvencyEpochObject } from "./epoch.js";
-import type { MarketProofStatus } from "./marketproof_status.js";
 import type { HealthStatus } from "./health.js";
 
 // ============================================================
@@ -111,10 +95,7 @@ export interface UniversalProofArtifact {
    * MarketProof admission status — ADMITTED if all admission checks passed
    * before financial evaluation; NOT_ADMITTED if any check failed.
    */
-  marketproof_status: MarketProofStatus;
-  /** Health decision result (HEALTHY / LIQUIDITY_STRESSED / UNDERCOLLATERALIZED / CRITICAL) */
-  decision_result: string;
-  /** Numeric inputs used in the financial evaluation */
+  marketproof_status: string;
   /** Structured health decision result */
   decision_result: DecisionResult;
   /** Numeric inputs and context used in the financial evaluation */
@@ -201,19 +182,6 @@ function buildAnchorMetadata(input: AnchorMetadataInput = {}): AnchorMetadata {
 /**
  * Converts a canonical SolvencyEpochObject into a UniversalProofArtifact.
  *
- * MarketProof reason codes (from the admission check) are prepended to the
- * financial reason codes so the admission decision is always visible first.
- *
- * @param epoch         - Canonical epoch object produced by the backend engine
- * @param anchorMetadata - Optional on-chain anchor details (populated after submit)
- * @param epoch         - Canonical epoch object produced by the backend engine
- * @param anchorMetadata - Optional on-chain anchor details (populated after submit)
- * @param ruleSnapshot  - Optional CompliState rule snapshot (policy lineage + hash)
- */
-export function toUniversalProofArtifact(
-  epoch: SolvencyEpochObject,
-  anchorMetadata: AnchorMetadata = {},
-  ruleSnapshot?: RuleSnapshot
  * @param epoch       - Canonical epoch object produced by the backend engine
  * @param anchorInput - Optional on-chain anchor details (populated after submit)
  * @param jurisdiction      - Regulatory jurisdiction of the entity (default: "")
@@ -225,21 +193,13 @@ export function toUniversalProofArtifact(
   jurisdiction = "",
   marketproofStatus = "UNKNOWN"
 ): UniversalProofArtifact {
-  // Merge MarketProof admission codes first, then financial reason codes.
-  const marketproofCodes = epoch.marketproof_reason_codes ?? [];
   const financialCodes = deriveFinancialReasonCodes(epoch.capital_backed, epoch.liquidity_ready);
 
   return {
-    module:             "solvency",
-    entity_id:          epoch.entity_id,
-    rule_version_used:  epoch.adapter_version,
-    marketproof_status: epoch.marketproof_status ?? "ADMITTED",
-    decision_result:    epoch.health_status,
     module:            "solvency",
     entity_id:         epoch.entity_id,
-    rule_version_used: ruleSnapshot?.policy_version ?? epoch.adapter_version,
-    decision_result:   epoch.health_status,
     rule_version_used: epoch.adapter_version,
+    marketproof_status: marketproofStatus,
     decision_result: {
       capital_backed:  epoch.capital_backed,
       liquidity_ready: epoch.liquidity_ready,
@@ -256,14 +216,7 @@ export function toUniversalProofArtifact(
       epoch_id:                    epoch.epoch_id,
       marketproof_status:          marketproofStatus,
     },
-    reason_codes:    [...marketproofCodes, ...financialCodes],
-    reason_codes:      deriveReasonCodes(epoch.capital_backed, epoch.liquidity_ready),
-    timestamp:         epoch.timestamp,
-    bundle_hash:       epoch.proof_hash,
-    anchor_metadata:   anchorMetadata,
-    policy_lineage:    ruleSnapshot?.policy_lineage,
-    rule_snapshot_hash: ruleSnapshot?.rule_snapshot_hash,
-    reason_codes:    deriveReasonCodes(epoch.capital_backed, epoch.liquidity_ready),
+    reason_codes:    financialCodes,
     timestamp:       epoch.timestamp,
     bundle_hash:     epoch.proof_hash,
     anchor_metadata: buildAnchorMetadata(anchorInput),
