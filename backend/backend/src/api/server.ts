@@ -615,10 +615,13 @@ app.get("/api/yellow/sessions", (_req: Request, res: Response) => {
     const totalLiabilities = yellowClearNode.getTotalLiabilities();
     
     res.json({
+      success: true,
       sessions: sessions.map((s) => ({
         id: s.id,
         channelId: s.channelId,
         status: s.status,
+        participants: s.participants,
+        allocations: s.allocations,
         participantCount: s.participants.length,
         nonce: s.nonce,
         createdAt: s.createdAt,
@@ -629,7 +632,7 @@ app.get("/api/yellow/sessions", (_req: Request, res: Response) => {
     });
   } catch (err: unknown) {
     const error = err as Error;
-    res.status(500).json({ error: "Failed to list sessions", details: error.message });
+    res.status(500).json({ success: false, error: "Failed to list sessions", details: error.message });
   }
 });
 
