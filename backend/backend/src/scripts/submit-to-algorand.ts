@@ -16,15 +16,17 @@ import { readFileSync, writeFileSync } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import algosdk from "algosdk";
+import dotenv from "dotenv";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+// Load environment variables
+dotenv.config({ path: path.resolve(__dirname, "../../../../.env") });
 
 // Import Algorand adapter functions
 import {
   toAlgorandSolventRegistryPayload,
-  encodeState,
-  makeLatestBoxKey,
-  makeEpochBoxKey,
+  createTestnetClientFromMnemonic,
 } from "../../../../algorand/client/registry_client.js";
 
 // ============================================================
@@ -49,13 +51,11 @@ if (!ALGO_MNEMONIC) {
   process.exit(1);
 }
 
-const algodClient = new algosdk.Algodv2(
-  ALGORAND_NODE_TOKEN,
-  ALGORAND_NODE_URL,
-  ALGORAND_NODE_PORT
+// Create Algorand client
+const client = createTestnetClientFromMnemonic(
+  BigInt(SOLVENT_REGISTRY_APP_ID!),
+  ALGO_MNEMONIC!
 );
-
-const signerAccount = algosdk.mnemonicToSecretKey(ALGO_MNEMONIC);
 
 // ============================================================
 // LOAD EPOCH DATA
@@ -105,89 +105,22 @@ async function submitEpoch() {
 
   // Convert to Algorand payload
   const algoPayload = toAlgorandSolventRegistryPayload(canonicalEpoch);
-  const insolvencyFlag = !algoPayload.capital_backed;
-  const liquidityStressFlag = !algoPayload.liquidity_ready;
-
-  // Encode state for box storage
-  const encodedState = encodeState(algoPayload, insolvencyFlag, liquidityStressFlag);
-  console.log(`  Encoded Size:   ${encodedState.length} bytes`);
-
-  // Generate box keys
-  const latestBoxKey = makeLatestBoxKey(algoPayload.entity_id);
-  const epochBoxKey = makeEpochBoxKey(algoPayload.entity_id, algoPayload.epoch_id);
 
   console.log("\n" + "─".repeat(60));
   console.log("  Submitting to Algorand...");
   console.log("─".repeat(60));
 
-  const params = await algodClient.getTransactionParams().do();
-  const appId = Number(SOLVENT_REGISTRY_APP_ID);
-
-  // Calculate box MBR (Minimum Balance Requirement)
-  const boxMBR = 2500 + 400 * encodedState.length; // 2500 base + 400 per byte
-
-  // Create application call transaction
-  const txn = algosdk.makeApplicationCallTxnFromObject({
-    from: signerAccount.addr,
-    appIndex: appId,
-    onComplete: algosdk.OnApplicationComplete.NoOpOC,
-    appArgs: [
-      new TextEncoder().encode("submit_epoch"), // Method selector
-      encodedState, // Encoded epoch state
-    ],
-    boxes: [
-      { appIndex: appId, name: latestBoxKey },
-      { appIndex: appId, name: epochBoxKey },
-    ],
-    suggestedParams: {
-      ...params,
-      fee: 2000, // Increased fee for box operations
-      flatFee: true,
-    },
-  });
-
-  // Fund contract for box storage if needed
-  const appAddress = algosdk.getApplicationAddress(appId);
-  const appAccountInfo = await algodClient.accountInformation(appAddress).do();
-  const currentBalance = appAccountInfo.amount;
-  const requiredBalance = appAccountInfo["min-balance"] + boxMBR * 2; // 2 boxes
-
-  if (currentBalance < requiredBalance) {
-    console.log(`  Funding contract for box storage...`);
-    const fundAmount = requiredBalance - currentBalance + 100_000; // Extra buffer
-
-    const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
-      from: signerAccount.addr,
-      to: appAddress,
-      amount: fundAmount,
-      suggestedParams: params,
-    });
-
-    const signedFundTxn = fundTxn.signTxn(signerAccount.sk);
-    const fundResult = await algodClient.sendRawTransaction(signedFundTxn).do();
-    await algosdk.waitForConfirmation(algodClient, fundResult.txId, 4);
-    console.log(`  ✅ Contract funded with ${fundAmount / 1_000_000} ALGO`);
-  }
-
-  // Sign and submit the application call
-  const signedTxn = txn.signTxn(signerAccount.sk);
-  const { txId } = await algodClient.sendRawTransaction(signedTxn).do();
-
-  console.log(`  Transaction ID: ${txId}`);
-  console.log("  Waiting for confirmation...");
-
-  const confirmedTxn = await algosdk.waitForConfirmation(algodClient, txId, 4);
-  const confirmedRound = confirmedTxn["confirmed-round"];
+  // Use the SolventRegistryClient to submit
+  const txId = await client.submitEpoch(algoPayload);
 
   console.log(`\n  ✅ Epoch submitted successfully!`);
-  console.log(`  Confirmed Round: ${confirmedRound}`);
-  console.log(`  Explorer:        https://testnet.explorer.perawallet.app/tx/${txId}`);
+  console.log(`  Transaction ID: ${txId}`);
+  console.log(`  Explorer:       https://testnet.explorer.perawallet.app/tx/${txId}`);
 
   // Save submission result
   const submissionResult = {
     success: true,
     tx_id: txId,
-    confirmed_round: confirmedRound,
     app_id: SOLVENT_REGISTRY_APP_ID,
     entity_id: canonicalEpoch.entity_id,
     epoch_id: canonicalEpoch.epoch_id,

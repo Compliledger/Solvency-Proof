@@ -411,7 +411,7 @@ export default function YellowSessions() {
                                     <div>
                                         <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Liabilities</p>
                                         <p className="font-display text-2xl font-semibold">{totalLiabilities.toLocaleString()} wei</p>
-                                        <p className="text-xs text-muted-foreground">≈ {(Number(totalLiabilities) / 1e18).toFixed(6)} ETH</p>
+                                        <p className="text-xs text-muted-foreground">≈ {(Number(totalLiabilities) / 1e18).toExponential(3)} ETH</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="text-xs text-muted-foreground">Update Status</p>

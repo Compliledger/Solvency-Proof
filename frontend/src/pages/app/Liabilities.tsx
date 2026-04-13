@@ -57,6 +57,7 @@ export default function Liabilities() {
                 setMerkleRoot(res.root);
                 setEpochId(res.epochId || "");
                 setLeafCount(res.leafCount || 0);
+                setTotalLiabilities(Number(res.total) || 0);
                 setTreeBuilt(true);
             }
         } catch (err) {
