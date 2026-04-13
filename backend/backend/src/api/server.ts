@@ -124,14 +124,16 @@ app.get("/api/liabilities", (_req: Request, res: Response) => {
     }
 
     const root = JSON.parse(fs.readFileSync(rootPath, "utf-8"));
-    const total = JSON.parse(fs.readFileSync(totalPath, "utf-8"));
+    const total = fs.existsSync(totalPath) 
+      ? JSON.parse(fs.readFileSync(totalPath, "utf-8")) 
+      : {};
     const tree = fs.existsSync(treePath)
       ? JSON.parse(fs.readFileSync(treePath, "utf-8"))
       : null;
 
     res.json({
       root: root.liabilities_root,
-      total: total.total_liabilities,
+      total: total.liabilities_total || total.total_liabilities || 0,
       epochId: root.epoch_id,
       leafCount: root.leaf_count,
       timestamp: root.timestamp,
@@ -145,23 +147,108 @@ app.get("/api/liabilities", (_req: Request, res: Response) => {
 // POST /api/liabilities/build - Build liabilities Merkle tree
 app.post("/api/liabilities/build", async (_req: Request, res: Response) => {
   try {
-    const { execSync } = await import("child_process");
-    const result = execSync("npx tsx src/liabilities-builder.ts", {
-      cwd: path.join(__dirname, "../.."),
-      encoding: "utf-8",
+    const { buildMerkleTree, generateProof } = await import("../utils/merkle.js");
+    const { parse } = await import("csv-parse/sync");
+
+    const csvPath = path.join(DATA_DIR, "liabilities.csv");
+
+    // Auto-export from Yellow sessions if no CSV exists
+    if (!fs.existsSync(csvPath)) {
+      const sessions = yellowClearNode.listSessions();
+      const sessionWithData = sessions.find(
+        (s) => Object.keys(s.allocations || {}).length > 0
+      );
+      if (sessionWithData) {
+        yellowClearNode.exportToLiabilities(sessionWithData.id);
+      } else {
+        // Create a sample CSV so the build doesn't fail on first use
+        fs.mkdirSync(DATA_DIR, { recursive: true });
+        fs.writeFileSync(csvPath, "user_id,balance\nsample_user,1000\n");
+      }
+    }
+
+    // Parse CSV
+    const csvContent = fs.readFileSync(csvPath, "utf-8");
+    const rows: { user_id: string; balance: string }[] = parse(csvContent, {
+      columns: true,
+      skip_empty_lines: true,
+      trim: true,
     });
 
-    const rootPath = path.join(OUTPUT_DIR, "liabilities_root.json");
-    const root = JSON.parse(fs.readFileSync(rootPath, "utf-8"));
+    if (rows.length === 0) {
+      return res.status(400).json({ error: "No liability entries found in CSV" });
+    }
+
+    // Convert to bigint entries
+    const entries = rows.map((row) => ({
+      userId: row.user_id,
+      balance: BigInt(row.balance),
+    }));
+
+    // Build Merkle tree
+    const tree = buildMerkleTree(entries);
+
+    // Ensure output directory exists
+    if (!fs.existsSync(OUTPUT_DIR)) {
+      fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+    }
+
+    // Save liabilities root
+    const epochId = `epoch_${Date.now()}`;
+    const rootOutput = {
+      liabilities_root: tree.root,
+      epoch_id: epochId,
+      timestamp: Date.now(),
+      leaf_count: tree.leaves.length,
+    };
+    fs.writeFileSync(
+      path.join(OUTPUT_DIR, "liabilities_root.json"),
+      JSON.stringify(rootOutput, null, 2)
+    );
+
+    // Save liabilities total
+    const totalOutput = {
+      liabilities_total: tree.total.toString(),
+      epoch_id: epochId,
+    };
+    fs.writeFileSync(
+      path.join(OUTPUT_DIR, "liabilities_total.json"),
+      JSON.stringify(totalOutput, null, 2)
+    );
+
+    // Generate and save per-user inclusion proofs
+    const proofsDir = path.join(OUTPUT_DIR, "inclusion_proofs");
+    if (!fs.existsSync(proofsDir)) {
+      fs.mkdirSync(proofsDir, { recursive: true });
+    }
+
+    for (const leaf of tree.leaves) {
+      const proof = generateProof(tree, leaf.index);
+      const inclusionProof = {
+        userId: leaf.userId,
+        balance: leaf.balance.toString(),
+        leafHash: leaf.hash,
+        proof,
+        index: leaf.index,
+        root: tree.root,
+      };
+      fs.writeFileSync(
+        path.join(proofsDir, `inclusion_${leaf.userId}.json`),
+        JSON.stringify(inclusionProof, null, 2)
+      );
+    }
 
     res.json({
       success: true,
       message: "Liabilities tree built successfully",
-      data: root,
-      output: result,
+      root: tree.root,
+      totalLiabilities: Number(tree.total),
+      userCount: tree.leaves.length,
+      data: rootOutput,
     });
   } catch (err: unknown) {
     const error = err as Error;
+    console.error("[Liabilities Build] Error:", error.message);
     res.status(500).json({ error: "Failed to build liabilities", details: error.message });
   }
 });

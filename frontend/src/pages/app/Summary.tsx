@@ -17,6 +17,7 @@ import {
     Zap,
     GitBranch,
     Wallet,
+    Droplets,
 } from "lucide-react";
 
 export default function Summary() {
@@ -68,7 +69,8 @@ export default function Summary() {
                                 <p className="text-sm uppercase tracking-widest text-success/70">CRYPTOGRAPHICALLY</p>
                                 <p className="text-3xl font-bold text-success">VERIFIED</p>
                                 <div className="h-px bg-success/30 my-4" />
-                                <p className="text-lg font-medium">Reserves ≥ Liabilities</p>
+                                <p className="text-lg font-medium">Solvent & Liquid</p>
+                                <p className="text-sm text-muted-foreground">Reserves ≥ Liabilities &bull; Liquid Assets ≥ Near-Term Obligations</p>
                             </div>
                         </div>
 
@@ -102,15 +104,15 @@ export default function Summary() {
                             <ul className="space-y-3">
                                 <li className="flex items-start gap-3">
                                     <CheckCircle2 size={18} className="text-success mt-0.5 shrink-0" />
-                                    <span>Exchange holds sufficient ETH reserves</span>
+                                    <span><strong>Capital Backed:</strong> Total reserves ≥ total liabilities</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <CheckCircle2 size={18} className="text-purple-500 mt-0.5 shrink-0" />
+                                    <span><strong>Liquidity Ready:</strong> Liquid assets ≥ near-term obligations</span>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <CheckCircle2 size={18} className="text-success mt-0.5 shrink-0" />
-                                    <span>All users' balances are committed in Merkle tree</span>
-                                </li>
-                                <li className="flex items-start gap-3">
-                                    <CheckCircle2 size={18} className="text-success mt-0.5 shrink-0" />
-                                    <span>Reserves cover total liabilities</span>
+                                    <span>All users' balances committed in Merkle tree</span>
                                 </li>
                                 <li className="flex items-start gap-3">
                                     <CheckCircle2 size={18} className="text-success mt-0.5 shrink-0" />
@@ -174,8 +176,8 @@ export default function Summary() {
                             </div>
                             <div className="p-4 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-center">
                                 <Wallet size={24} className="mx-auto mb-2 text-emerald-500" />
-                                <p className="font-medium text-sm">Sepolia</p>
-                                <p className="text-xs text-muted-foreground">On-Chain Verification</p>
+                                <p className="font-medium text-sm">Algorand</p>
+                                <p className="text-xs text-muted-foreground">On-Chain Registry</p>
                             </div>
                         </div>
                     </div>
