@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const BASE_URL = 'https://solvency-proof-production.up.railway.app';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://solvency-proof-production.up.railway.app';
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // Cache keys
@@ -42,6 +42,15 @@ function setCache<T>(key: string, data: T): void {
 export function clearSolvencyCache(): void {
     Object.values(CACHE_KEYS).forEach(key => localStorage.removeItem(key));
     console.log('[CACHE] Cleared all solvency cache');
+}
+
+function clearCache(key: string): void {
+    try {
+        localStorage.removeItem(key);
+        console.log(`[CACHE CLEAR] ${key}`);
+    } catch (e) {
+        console.warn('[CACHE] Failed to clear:', e);
+    }
 }
 
 export function useSolvencyProof() {
@@ -149,10 +158,14 @@ export function useSolvencyProof() {
 
         submitProof: () => api<{
             success: boolean;
-            txHash: string;
-            blockNumber: number;
-            epochId: string;
-        }>('/api/proof/submit', { method: 'POST' }),
+            message?: string;
+            tx_id?: string;
+            app_id?: string;
+            network?: string;
+            txHash?: string;
+            blockNumber?: number;
+            epochId?: string;
+        }>('/api/proof/submit-algorand', { method: 'POST' }),
 
         // Contracts
         getEpochCount: () => api<{
@@ -187,25 +200,35 @@ export function useSolvencyProof() {
             }>;
         }>('/api/yellow/sessions', undefined, CACHE_KEYS.YELLOW_SESSIONS),
 
-        createYellowSession: (participants: string[]) => api<{
-            success: boolean;
-            session: {
-                id: string;
-                status: string;
-                participants: string[];
-                allocations: Record<string, string>;
-            };
-        }>('/api/yellow/session', {
-            method: 'POST',
-            body: JSON.stringify({ participants })
-        }),
+        createYellowSession: async (participants: string[]) => {
+            const result = await api<{
+                success: boolean;
+                session: {
+                    id: string;
+                    status: string;
+                    participants: string[];
+                    allocations: Record<string, string>;
+                };
+            }>('/api/yellow/session', {
+                method: 'POST',
+                body: JSON.stringify({ participants })
+            });
+            // Clear sessions cache so next fetch gets fresh data
+            clearCache(CACHE_KEYS.YELLOW_SESSIONS);
+            return result;
+        },
 
-        updateAllocations: (sessionId: string, allocations: Record<string, string>) => api<{
-            success: boolean;
-        }>(`/api/yellow/session/${sessionId}/allocations`, {
-            method: 'PUT',
-            body: JSON.stringify({ allocations })
-        }),
+        updateAllocations: async (sessionId: string, allocations: Record<string, string>) => {
+            const result = await api<{
+                success: boolean;
+            }>(`/api/yellow/session/${sessionId}/allocations`, {
+                method: 'PUT',
+                body: JSON.stringify({ allocations })
+            });
+            // Clear sessions cache so next fetch gets fresh data
+            clearCache(CACHE_KEYS.YELLOW_SESSIONS);
+            return result;
+        },
 
         // Full Workflow
         runFullWorkflow: (skipProof = false) => api<{

@@ -106,8 +106,9 @@ export default function ProofGenerator() {
         try {
             const res = await submitProof();
             console.log("[ProofGenerator] Submit response:", res);
-            setTxHash(res.txHash);
-            setBlockNumber(res.blockNumber);
+            // Handle both Algorand (tx_id) and Ethereum (txHash) responses
+            setTxHash(res.tx_id || res.txHash || '');
+            setBlockNumber(res.blockNumber || null);
         } catch (err) {
             console.error("[ProofGenerator] Failed to submit:", err);
         } finally {

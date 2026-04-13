@@ -452,6 +452,26 @@ app.post("/api/proof/submit", async (_req: Request, res: Response) => {
 app.post("/api/proof/submit-algorand", async (_req: Request, res: Response) => {
   try {
     const { execSync } = await import("child_process");
+    
+    // Check if latest_epoch.json exists, if not build it first
+    const epochPath = path.join(OUTPUT_DIR, "latest_epoch.json");
+    if (!fs.existsSync(epochPath)) {
+      console.log("[Submit Algorand] Building epoch first...");
+      try {
+        execSync("npx tsx src/scripts/build-epoch.ts", {
+          cwd: path.join(__dirname, "../.."),
+          encoding: "utf-8",
+          timeout: 60000,
+        });
+      } catch (buildErr) {
+        console.error("[Submit Algorand] Failed to build epoch:", buildErr);
+        return res.status(500).json({ 
+          error: "Failed to build epoch before submission", 
+          details: buildErr instanceof Error ? buildErr.message : String(buildErr)
+        });
+      }
+    }
+
     const result = execSync("npx tsx src/scripts/submit-to-algorand.ts", {
       cwd: path.join(__dirname, "../.."),
       encoding: "utf-8",
