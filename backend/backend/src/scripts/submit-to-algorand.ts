@@ -107,6 +107,45 @@ async function submitEpoch() {
   const algoPayload = toAlgorandSolventRegistryPayload(canonicalEpoch);
 
   console.log("\n" + "─".repeat(60));
+  console.log("  Checking app account balance...");
+  console.log("─".repeat(60));
+
+  // Fund the app account if balance is too low for box storage
+  const algodClient = new algosdk.Algodv2(ALGORAND_NODE_TOKEN, ALGORAND_NODE_URL, ALGORAND_NODE_PORT);
+  const appId = Number(SOLVENT_REGISTRY_APP_ID);
+  const appAddress = algosdk.getApplicationAddress(appId);
+  const appInfo = await algodClient.accountInformation(appAddress).do();
+  const currentBalance = Number(appInfo.amount);
+  const minBalance = Number((appInfo as any).minBalance ?? (appInfo as any)["min-balance"] ?? 0);
+  // Need extra for new box: 2500 base + 400 per byte (estimate ~400 bytes)
+  const boxCost = 2500 + 400 * 400;
+  const requiredBalance = minBalance + boxCost + 100_000; // extra buffer
+
+  console.log(`  App balance:  ${currentBalance} microALGO`);
+  console.log(`  Required:     ${requiredBalance} microALGO`);
+
+  if (currentBalance < requiredBalance) {
+    const fundAmount = requiredBalance - currentBalance + 200_000; // extra buffer
+    console.log(`  Funding app with ${fundAmount} microALGO...`);
+
+    const signerAccount = algosdk.mnemonicToSecretKey(ALGO_MNEMONIC!);
+    const params = await algodClient.getTransactionParams().do();
+    const fundTxn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+      sender: signerAccount.addr,
+      receiver: appAddress,
+      amount: fundAmount,
+      suggestedParams: params,
+    } as any);
+    const signedFundTxn = fundTxn.signTxn(signerAccount.sk);
+    const fundResult = await algodClient.sendRawTransaction(signedFundTxn).do();
+    const fundTxId = (fundResult as any).txId || (fundResult as any).txid;
+    await algosdk.waitForConfirmation(algodClient, fundTxId, 4);
+    console.log(`  ✅ App funded: +${(fundAmount / 1_000_000).toFixed(3)} ALGO`);
+  } else {
+    console.log(`  ✅ Balance sufficient`);
+  }
+
+  console.log("\n" + "─".repeat(60));
   console.log("  Submitting to Algorand...");
   console.log("─".repeat(60));
 

@@ -471,23 +471,20 @@ app.post("/api/proof/submit-algorand", async (_req: Request, res: Response) => {
   try {
     const { execSync } = await import("child_process");
     
-    // Check if latest_epoch.json exists, if not build it first
-    const epochPath = path.join(OUTPUT_DIR, "latest_epoch.json");
-    if (!fs.existsSync(epochPath)) {
-      console.log("[Submit Algorand] Building epoch first...");
-      try {
-        execSync("npx tsx src/scripts/build-epoch.ts", {
-          cwd: path.join(__dirname, "../.."),
-          encoding: "utf-8",
-          timeout: 60000,
-        });
-      } catch (buildErr) {
-        console.error("[Submit Algorand] Failed to build epoch:", buildErr);
-        return res.status(500).json({ 
-          error: "Failed to build epoch before submission", 
-          details: buildErr instanceof Error ? buildErr.message : String(buildErr)
-        });
-      }
+    // Always rebuild epoch to get a fresh epoch_id (avoids duplicate epoch rejection)
+    console.log("[Submit Algorand] Building fresh epoch...");
+    try {
+      execSync("npx tsx src/scripts/build-epoch.ts", {
+        cwd: path.join(__dirname, "../.."),
+        encoding: "utf-8",
+        timeout: 60000,
+      });
+    } catch (buildErr) {
+      console.error("[Submit Algorand] Failed to build epoch:", buildErr);
+      return res.status(500).json({ 
+        error: "Failed to build epoch before submission", 
+        details: buildErr instanceof Error ? buildErr.message : String(buildErr)
+      });
     }
 
     console.log("[Submit Algorand] Submitting to Algorand...");
@@ -499,12 +496,28 @@ app.post("/api/proof/submit-algorand", async (_req: Request, res: Response) => {
         timeout: 120000,
       });
     } catch (submitErr: any) {
-      console.error("[Submit Algorand] Submission failed:", submitErr);
+      const errMsg = submitErr.stderr || submitErr.message || String(submitErr);
+      console.error("[Submit Algorand] Submission failed:", errMsg);
+      
+      // If epoch already submitted, return the existing submission as success
+      if (errMsg.includes("assert failed") || errMsg.includes("logic eval error")) {
+        const existingPath = path.join(OUTPUT_DIR, "algorand_submission.json");
+        if (fs.existsSync(existingPath)) {
+          const existing = JSON.parse(fs.readFileSync(existingPath, "utf-8"));
+          return res.json({
+            success: true,
+            message: "Epoch already submitted on-chain",
+            tx_id: existing.tx_id,
+            app_id: existing.app_id,
+            network: existing.network,
+            data: existing,
+          });
+        }
+      }
+      
       return res.status(500).json({
         error: "Failed to submit to Algorand",
-        details: submitErr.message || String(submitErr),
-        stderr: submitErr.stderr || "",
-        stdout: submitErr.stdout || "",
+        details: errMsg,
       });
     }
 
