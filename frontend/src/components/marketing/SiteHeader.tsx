@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import logo from "@/assets/solvencyproof-logo.png";
+import logo from "/Logo.jpg";
 import PillNav from "@/components/reactbits/PillNav";
 
 type Props = {
@@ -20,7 +20,7 @@ export function SiteHeader({ onNavigate }: Props) {
 
   return (
     <header className="absolute top-0 left-0 right-0 z-50">
-      <div className="container flex justify-center pt-4">
+      <div className="container flex justify-center pt-2">
         <PillNav
           logo={logo}
           logoAlt="SolvencyProof"
@@ -31,6 +31,12 @@ export function SiteHeader({ onNavigate }: Props) {
           hoveredPillTextColor="#1a1a1a"
           pillTextColor="#A0A0A0"
           initialLoadAnimation={true}
+          className="logo-enlarged"
+          style={{
+            '--nav-h': '50px',
+            '--logo': '46px'
+          } as React.CSSProperties}
+          logoClassName="logo-rounded-frame"
         />
       </div>
     </header>

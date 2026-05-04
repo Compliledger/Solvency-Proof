@@ -21,6 +21,8 @@ export interface PillNavProps {
   pillTextColor?: string;
   onMobileMenuClick?: () => void;
   initialLoadAnimation?: boolean;
+  style?: React.CSSProperties;
+  logoClassName?: string;
 }
 
 const PillNav: React.FC<PillNavProps> = ({
@@ -35,7 +37,9 @@ const PillNav: React.FC<PillNavProps> = ({
   hoveredPillTextColor = '#060010',
   pillTextColor,
   onMobileMenuClick,
-  initialLoadAnimation = true
+  initialLoadAnimation = true,
+  style,
+  logoClassName
 }) => {
   const resolvedPillTextColor = pillTextColor ?? baseColor;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -251,7 +255,7 @@ const PillNav: React.FC<PillNavProps> = ({
       <nav
         className={`w-full md:w-max flex items-center justify-between md:justify-start box-border px-4 md:px-0 ${className}`}
         aria-label="Primary"
-        style={cssVars}
+        style={{...cssVars, ...style}}
       >
         {isRouterLink(items?.[0]?.href) ? (
           <Link
@@ -262,14 +266,17 @@ const PillNav: React.FC<PillNavProps> = ({
             ref={el => {
               logoRef.current = el;
             }}
-            className="rounded-full p-2 inline-flex items-center justify-center overflow-hidden"
+            className={`rounded-full p-2 inline-flex items-center justify-center overflow-hidden ${logoClassName || ''}`}
             style={{
               width: 'var(--nav-h)',
               height: 'var(--nav-h)',
-              background: 'var(--base, #000)'
+              background: logoClassName === 'logo-rounded-frame' ? '#2a2a2a' : logoClassName ? 'transparent' : 'var(--base, #000)',
+              padding: logoClassName ? '0' : undefined,
+              borderRadius: logoClassName === 'logo-rounded-frame' ? '50%' : logoClassName ? '0' : undefined,
+              border: logoClassName === 'logo-rounded-frame' ? '2px solid #D0D0D0' : undefined
             }}
           >
-            <img src={logo} alt={logoAlt} ref={logoImgRef} className="w-full h-full object-cover block" />
+            <img src={logo} alt={logoAlt} ref={logoImgRef} className="w-full h-full object-contain block" />
           </Link>
         ) : (
           <a
@@ -279,14 +286,17 @@ const PillNav: React.FC<PillNavProps> = ({
             ref={el => {
               logoRef.current = el;
             }}
-            className="rounded-full p-2 inline-flex items-center justify-center overflow-hidden"
+            className={`rounded-full p-2 inline-flex items-center justify-center overflow-hidden ${logoClassName || ''}`}
             style={{
               width: 'var(--nav-h)',
               height: 'var(--nav-h)',
-              background: 'var(--base, #000)'
+              background: logoClassName === 'logo-rounded-frame' ? '#2a2a2a' : logoClassName ? 'transparent' : 'var(--base, #000)',
+              padding: logoClassName ? '0' : undefined,
+              borderRadius: logoClassName === 'logo-rounded-frame' ? '50%' : logoClassName ? '0' : undefined,
+              border: logoClassName === 'logo-rounded-frame' ? '2px solid #D0D0D0' : undefined
             }}
           >
-            <img src={logo} alt={logoAlt} ref={logoImgRef} className="w-full h-full object-cover block" />
+            <img src={logo} alt={logoAlt} ref={logoImgRef} className="w-full h-full object-contain block" />
           </a>
         )}
 
